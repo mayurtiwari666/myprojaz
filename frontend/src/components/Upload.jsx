@@ -3,7 +3,7 @@ import axios from 'axios';
 import { UploadCloud, File, CheckCircle, Loader2, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.PROD ? "" : "http://localhost:8000";
 
 export default function Upload({ onUploadSuccess }) {
     const [file, setFile] = useState(null);

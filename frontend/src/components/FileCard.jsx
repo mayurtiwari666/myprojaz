@@ -3,7 +3,7 @@ import { FileText, History, Eye, Tag, Plus, RotateCcw, ChevronDown, Check, Trash
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.PROD ? "" : "http://localhost:8000";
 
 export default function FileCard({ file, viewingVersions, versions, onPreview, onFetchVersions, availableTags, onUpdateFileTags, isContributor, onDelete, onDownload }) {
     const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);

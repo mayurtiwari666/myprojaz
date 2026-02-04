@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Tag, Trash2, Plus, RefreshCw, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.PROD ? "" : "http://localhost:8000";
 
 const PRESET_COLORS = [
     '#72dbc8', // Teal (Develop)
