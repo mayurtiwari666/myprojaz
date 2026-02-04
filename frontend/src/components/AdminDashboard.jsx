@@ -57,8 +57,22 @@ export default function AdminDashboard() {
         loadAll();
     }, []);
 
-    const handleExport = () => {
-        window.open(`${API_URL}/admin/export-audit`, '_blank');
+    const handleExport = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/admin/export-audit`, {
+                responseType: 'blob', // Important for file download
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `audit_logs_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } catch (e) {
+            console.error("Export failed", e);
+            alert("Failed to export audit logs. Check console.");
+        }
     };
 
     if (loading) return (

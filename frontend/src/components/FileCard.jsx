@@ -88,14 +88,16 @@ export default function FileCard({ file, viewingVersions, versions, onPreview, o
                         </button>
                     )}
 
-                    {/* Versions Button */}
-                    <button
-                        onClick={() => onFetchVersions(file.filename)}
-                        className={`p-2 rounded-lg transition-all ${viewingVersions === file.filename ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
-                        title="View History"
-                    >
-                        <History className="w-5 h-5" />
-                    </button>
+                    {/* Versions Button (Contributors/Admins only) */}
+                    {isContributor && (
+                        <button
+                            onClick={() => onFetchVersions(file.filename)}
+                            className={`p-2 rounded-lg transition-all ${viewingVersions === file.filename ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
+                            title="View History"
+                        >
+                            <History className="w-5 h-5" />
+                        </button>
+                    )}
 
                     {/* Delete Button (Contributors/Admins) */}
                     {isContributor && (
@@ -108,50 +110,52 @@ export default function FileCard({ file, viewingVersions, versions, onPreview, o
                         </button>
                     )}
 
-                    {/* Tags Dropdown */}
-                    <div className="relative">
-                        <button
-                            onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
-                            className={`p-2 rounded-lg transition-all ${isTagDropdownOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'}`}
-                            title="Manage Tags"
-                        >
-                            <Tag className="w-5 h-5" />
-                        </button>
+                    {/* Tags Dropdown - RESTRICTED TO CONTRIBUTORS */}
+                    {isContributor && (
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
+                                className={`p-2 rounded-lg transition-all ${isTagDropdownOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'}`}
+                                title="Manage Tags"
+                            >
+                                <Tag className="w-5 h-5" />
+                            </button>
 
-                        {isTagDropdownOpen && (
-                            <>
-                                <div
-                                    className="fixed inset-0 z-40"
-                                    onClick={() => setIsTagDropdownOpen(false)}
-                                ></div>
-                                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 p-2 animate-in fade-in zoom-in-95 duration-200">
-                                    <h6 className="text-xs font-bold text-gray-400 uppercase px-2 py-1 mb-1">Assign Tags</h6>
-                                    {availableTags.length === 0 ? (
-                                        <p className="text-xs text-gray-500 px-2 py-2 italic text-center">No tags created yet.</p>
-                                    ) : (
-                                        <div className="max-h-48 overflow-y-auto space-y-1">
-                                            {availableTags.map(tag => {
-                                                const isSelected = file.tags?.includes(tag.name);
-                                                return (
-                                                    <button
-                                                        key={tag.name}
-                                                        onClick={() => handleAssignTag(tag.name)}
-                                                        className="w-full text-left px-2 py-1.5 rounded-lg text-sm hover:bg-gray-50 flex items-center justify-between group/item"
-                                                    >
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }}></div>
-                                                            <span className="text-gray-700 font-medium">{tag.name}</span>
-                                                        </div>
-                                                        {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600" />}
-                                                    </button>
-                                                )
-                                            })}
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        )}
-                    </div>
+                            {isTagDropdownOpen && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-40"
+                                        onClick={() => setIsTagDropdownOpen(false)}
+                                    ></div>
+                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 p-2 animate-in fade-in zoom-in-95 duration-200">
+                                        <h6 className="text-xs font-bold text-gray-400 uppercase px-2 py-1 mb-1">Assign Tags</h6>
+                                        {availableTags.length === 0 ? (
+                                            <p className="text-xs text-gray-500 px-2 py-2 italic text-center">No tags created yet.</p>
+                                        ) : (
+                                            <div className="max-h-48 overflow-y-auto space-y-1">
+                                                {availableTags.map(tag => {
+                                                    const isSelected = file.tags?.includes(tag.name);
+                                                    return (
+                                                        <button
+                                                            key={tag.name}
+                                                            onClick={() => handleAssignTag(tag.name)}
+                                                            className="w-full text-left px-2 py-1.5 rounded-lg text-sm hover:bg-gray-50 flex items-center justify-between group/item"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }}></div>
+                                                                <span className="text-gray-700 font-medium">{tag.name}</span>
+                                                            </div>
+                                                            {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600" />}
+                                                        </button>
+                                                    )
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 

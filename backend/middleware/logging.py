@@ -43,7 +43,7 @@ class ActivityLoggingMiddleware(BaseHTTPMiddleware):
                         claims = jwt.get_unverified_claims(token)
                         # print(f"DEBUG: Claims keys: {claims.keys()}")
                         
-                        user = claims.get("username") or claims.get("cognito:username")
+                        user = claims.get("username") or claims.get("cognito:username") or claims.get("sub")
                         
                         if not user:
                              print(f"DEBUG: User not found in claims. Claims: {claims}")

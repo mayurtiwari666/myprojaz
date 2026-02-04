@@ -5,21 +5,17 @@ import os
 from docx import Document
 from pptx import Presentation
 from backend.config import settings
+import pytesseract
+from pdf2image import convert_from_bytes
 
 s3_client = boto3.client('s3', region_name=settings.AWS_REGION)
 
-# Initialize Textract with Specific Credentials (Secondary Account)
-textract_client = boto3.client(
-    'textract',
-    region_name=settings.AWS_TEXTRACT_REGION,
-    aws_access_key_id=settings.AWS_TEXTRACT_ACCESS_KEY_ID,
-    aws_secret_access_key=settings.AWS_TEXTRACT_SECRET_ACCESS_KEY
-)
+# NOTE: Textract Client removed in favor of Tesseract (Local OCR)
 
 def extract_text_from_s3(file_key: str) -> str:
     """
     Downloads a file from S3 and extracts its text based on extension.
-    Supports: .pdf (with Textract fallback), .docx, .pptx, .txt
+    Supports: .pdf (with Tesseract fallback), .docx, .pptx, .txt
     """
     try:
         ext = os.path.splitext(file_key)[1].lower()
@@ -30,9 +26,8 @@ def extract_text_from_s3(file_key: str) -> str:
         file_stream = io.BytesIO(file_content)
         
         if ext == '.pdf':
-            print(f"PDF detected: {file_key}. Using AWS Textract (Policy: Always Use Textract).")
-            # Force Textract call directly using BYTES to avoid cross-account S3 issues
-            return _extract_with_textract(file_content)
+            print(f"PDF detected: {file_key}. Attempting pypdf first...")
+            return _extract_from_pdf(file_stream, file_content)
         elif ext in ['.docx', '.doc']:
             return _extract_from_docx(file_stream)
         elif ext in ['.pptx', '.ppt']:
@@ -40,8 +35,8 @@ def extract_text_from_s3(file_key: str) -> str:
         elif ext in ['.txt', '.md']:
             return file_content.decode('utf-8', errors='ignore')
         elif ext in ['.jpg', '.jpeg', '.png']:
-            print("Image file detected. Skipping text extraction as per budget policy.")
-            return "" # Return empty string for images (Metadata only)
+            print("Image file detected. Using Tesseract for OCR.")
+            return _extract_with_tesseract(file_content)
         else:
             print(f"Unsupported file type for extraction: {ext}")
             return ""
@@ -50,9 +45,9 @@ def extract_text_from_s3(file_key: str) -> str:
         print(f"Error extracting text from {file_key}: {e}")
         raise e
 
-def _extract_from_pdf(file_stream, file_key) -> str:
+def _extract_from_pdf(file_stream, file_bytes) -> str:
     """
-    Hybrid extraction: pypdf first, Textract fallback if empty.
+    Hybrid extraction: pypdf first, Tesseract fallback if empty.
     """
     text = ""
     try:
@@ -65,43 +60,41 @@ def _extract_from_pdf(file_stream, file_key) -> str:
         print(f"pypdf failed: {e}")
     
     # Check if scanned (empty or very short text)
-    # Debug: Check what pypdf actually found
     print(f"pypdf extracted {len(text)} chars. Preview: {text[:200]!r}")
 
     # Check 1: Length (Too short?)
-    if not text or len(text.strip()) < 200:
-        print(f"PDF text length ({len(text.strip())}) < 200. Marking as scanned.")
-        return _extract_with_textract(settings.S3_BUCKET_NAME, file_key)
+    # Increased to 500 because "Naac_appLetter.pdf" had ~250 chars of metadata/header text.
+    if not text or len(text.strip()) < 500:
+        print(f"PDF text length ({len(text.strip())}) < 500. Marking as scanned. Falling back to Tesseract...")
+        return _extract_with_tesseract(file_bytes)
 
     # Check 2: Density (Garbage/Symbols?)
-    # Count alphanumeric chars (a-z, 0-9)
     alphanumeric_count = sum(c.isalnum() for c in text)
     density = alphanumeric_count / len(text) if len(text) > 0 else 0
     
     if density < 0.5:
-        print(f"PDF text density ({density:.2f}) < 0.5. likely garbage OCR or symbols. Falling back to AWS Textract...")
-        return _extract_with_textract(settings.S3_BUCKET_NAME, file_key)
+        print(f"PDF text density ({density:.2f}) < 0.5. likely garbage OCR or symbols. Falling back to Tesseract...")
+        return _extract_with_tesseract(file_bytes)
         
     return text
 
-def _extract_with_textract(file_bytes) -> str:
+def _extract_with_tesseract(file_bytes) -> str:
     """
-    Uses AWS Textract to detect text in a document using raw bytes.
-    This avoids cross-account S3 permission issues.
+    Uses Tesseract (Local OCR) to detect text in a document using raw bytes.
+    Requires: 'tesseract' installed on system, 'poppler' installed on system.
     """
     try:
-        response = textract_client.detect_document_text(
-            Document={'Bytes': file_bytes}
-        )
-        blocks = response.get('Blocks', [])
+        print("Starting Tesseract OCR...")
+        images = convert_from_bytes(file_bytes)
         text = ""
-        for block in blocks:
-            if block['BlockType'] == 'LINE':
-                text += block['Text'] + "\n"
-        print(f"Textract successfully extracted {len(text)} chars. Preview: {text[:200]!r}")
+        for i, image in enumerate(images):
+            print(f"OCR Processing Page {i+1}...")
+            text += pytesseract.image_to_string(image) + "\n"
+        
+        print(f"Tesseract successfully extracted {len(text)} chars.")
         return text
     except Exception as e:
-        print(f"Textract failed: {e}")
+        print(f"Tesseract failed: {e}")
         return ""
 
 def _extract_from_docx(file_stream) -> str:
