@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import TagManager from './TagManager';
 
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.PROD ? "" : "http://localhost:8000";
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
