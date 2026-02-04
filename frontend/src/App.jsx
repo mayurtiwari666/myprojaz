@@ -10,7 +10,7 @@ import TagFilter from './components/TagFilter';
 import PreviewModal from './components/PreviewModal';
 import axios from 'axios';
 
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.PROD ? "" : "http://localhost:8000";
 
 // --- REFACTORED COMPONENT: Separating Auth from Content ---
 
