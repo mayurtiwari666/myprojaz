@@ -1,8 +1,10 @@
+from dotenv import load_dotenv
+load_dotenv() # Load Environment Variables FIRST
+
 from fastapi import FastAPI, UploadFile, File, Form, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import boto3
 import os
-from dotenv import load_dotenv
 from backend.services.file_processor import extract_text_from_s3
 from backend.services.vector_store import vector_store
 from backend.middleware.logging import ActivityLoggingMiddleware

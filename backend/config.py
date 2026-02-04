@@ -7,11 +7,6 @@ class Settings(BaseSettings):
     COGNITO_USER_POOL_ID: str = "us-east-1_VT82bTVEX"
     COGNITO_CLIENT_ID: str = "2mhovll3csgcqmg8uj6le5ffhd"
 
-    # Secondary Account for Textract OCR
-    AWS_TEXTRACT_ACCESS_KEY_ID: str = ""
-    AWS_TEXTRACT_SECRET_ACCESS_KEY: str = ""
-    AWS_TEXTRACT_REGION: str = "us-west-2"
-
     # Main AWS Credentials (Optional, picked up by Boto3 via Env)
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
