@@ -15,15 +15,24 @@ router = APIRouter(
     dependencies=[Depends(require_admin)]
 )
 
-dynamodb = boto3.resource('dynamodb', region_name=settings.AWS_REGION)
-activity_table = dynamodb.Table('rnd-hub-activity')
-files_table = dynamodb.Table('rnd-hub-metadata')
-s3 = boto3.client('s3', region_name=settings.AWS_REGION)
-cognito = boto3.client('cognito-idp', region_name=settings.AWS_REGION)
+# Helper for Lazy Loading
+def get_aws_resources():
+    dynamodb = boto3.resource('dynamodb', region_name=settings.AWS_REGION)
+    return {
+        'files': dynamodb.Table('rnd-hub-metadata'),
+        'activity': dynamodb.Table('rnd-hub-activity'),
+        's3': boto3.client('s3', region_name=settings.AWS_REGION),
+        'cognito': boto3.client('cognito-idp', region_name=settings.AWS_REGION)
+    }
 
 @router.get("/stats")
 def get_dashboard_stats():
     try:
+        aws = get_aws_resources()
+        files_table = aws['files']
+        activity_table = aws['activity']
+        cognito = aws['cognito']
+
         # File Counts
         files_response = files_table.scan(Select='COUNT')
         total_files = files_response['Count']
@@ -86,6 +95,9 @@ def get_dashboard_stats():
 @router.get("/users")
 def get_users():
     try:
+        aws = get_aws_resources()
+        cognito = aws['cognito']
+
         # Fetch Users
         response = cognito.list_users(UserPoolId=settings.COGNITO_USER_POOL_ID)
         users = []
@@ -115,6 +127,9 @@ def get_users():
 @router.post("/log-login")
 def log_login(user_details: dict = Body(...)):
     try:
+        aws = get_aws_resources()
+        activity_table = aws['activity']
+        
         item = {
             'event_id': str(uuid.uuid4()),
             'timestamp': datetime.datetime.utcnow().isoformat(),
@@ -133,6 +148,9 @@ def log_login(user_details: dict = Body(...)):
 @router.get("/audit-logs")
 def get_audit_logs():
     try:
+        aws = get_aws_resources()
+        activity_table = aws['activity']
+
         # Scan logs
         response = activity_table.scan(Limit=100) # Cap at 100 for now
         items = response.get('Items', [])
@@ -145,6 +163,9 @@ def get_audit_logs():
 @router.get("/export-audit")
 def export_audit_logs():
     try:
+        aws = get_aws_resources()
+        activity_table = aws['activity']
+
         response = activity_table.scan()
         items = response.get('Items', [])
         

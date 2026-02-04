@@ -18,7 +18,10 @@ APP_CLIENT_ID = settings.COGNITO_CLIENT_ID
 KEYS_URL = f'https://cognito-idp.{REGION}.amazonaws.com/{USER_POOL_ID}/.well-known/jwks.json'
 
 security = HTTPBearer()
-cognito = boto3.client('cognito-idp', region_name=REGION)
+
+@lru_cache()
+def get_cognito_client():
+    return boto3.client('cognito-idp', region_name=REGION)
 
 @lru_cache()
 def get_jwks():
@@ -72,21 +75,21 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Security(securi
         try:
             # 1. Try direct lookup
             try:
-                g_resp = cognito.admin_list_groups_for_user(
+                g_resp = get_cognito_client().admin_list_groups_for_user(
                     UserPoolId=USER_POOL_ID,
                     Username=raw_username
                 )
-            except cognito.exceptions.UserNotFoundException:
+            except get_cognito_client().exceptions.UserNotFoundException:
                 # 2. UUID Fallback
                 print(f"AuthMiddleware: UserNotFound for {raw_username}, trying UUID resolution...")
-                u_resp = cognito.list_users(
+                u_resp = get_cognito_client().list_users(
                     UserPoolId=USER_POOL_ID,
                     Filter=f'sub = "{raw_username}"'
                 )
                 if u_resp['Users']:
                     resolved_username = u_resp['Users'][0]['Username']
                     print(f"AuthMiddleware: Resolved {raw_username} -> {resolved_username}")
-                    g_resp = cognito.admin_list_groups_for_user(
+                    g_resp = get_cognito_client().admin_list_groups_for_user(
                         UserPoolId=USER_POOL_ID,
                         Username=resolved_username
                     )
