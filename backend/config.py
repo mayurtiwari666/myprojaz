@@ -12,6 +12,10 @@ class Settings(BaseSettings):
     AWS_TEXTRACT_SECRET_ACCESS_KEY: str = ""
     AWS_TEXTRACT_REGION: str = "us-west-2"
 
+    # Main AWS Credentials (Optional, picked up by Boto3 via Env)
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
+
     class Config:
         env_file = ".env"
 
