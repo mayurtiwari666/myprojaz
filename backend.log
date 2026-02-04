@@ -1,0 +1,52 @@
+INFO:     Started server process [29665]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Downloading Vector Index from S3...
+Download Complete.
+INFO:     127.0.0.1:60960 - "OPTIONS /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60961 - "OPTIONS /tags HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60961 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60961 - "OPTIONS /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60960 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60961 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60960 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60961 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60960 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60960 - "OPTIONS /files/Naac_appLetter.pdf/view HTTP/1.1" 200 OK
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:60960 - "GET /files/Naac_appLetter.pdf/view HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60960 - "OPTIONS /files/Naac_appLetter.pdf/versions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60960 - "GET /files/Naac_appLetter.pdf/versions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60981 - "OPTIONS /files/upload-url?filename=Naac_appLetter.pdf&content_type=application%2Fpdf HTTP/1.1" 200 OK
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:60981 - "POST /files/upload-url?filename=Naac_appLetter.pdf&content_type=application%2Fpdf HTTP/1.1" 401 Unauthorized
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:60981 - "POST /files/upload-url?filename=Naac_appLetter.pdf&content_type=application%2Fpdf HTTP/1.1" 401 Unauthorized
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:60981 - "POST /files/upload-url?filename=Naac_appLetter.pdf&content_type=application%2Fpdf HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60993 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60996 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60997 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60981 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60993 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60997 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60999 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60996 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60999 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60996 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60997 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60999 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60996 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60996 - "POST /files/upload-url?filename=Naac_appLetter.pdf&content_type=application%2Fpdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60996 - "OPTIONS /files/ingest HTTP/1.1" 200 OK
+Processing Naac_appLetter.pdf...
+Extraction started for Naac_appLetter.pdf (.pdf)
+PDF detected: Naac_appLetter.pdf. Using AWS Textract (Policy: Always Use Textract).
+Textract failed: An error occurred (UnrecognizedClientException) when calling the DetectDocumentText operation: The security token included in the request is invalid.
+INFO:     127.0.0.1:60996 - "POST /files/ingest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61023 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60996 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61023 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61048 - "OPTIONS /search?q=choice%20based%20credit%20system HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61048 - "GET /search?q=choice%20based%20credit%20system HTTP/1.1" 200 OK
