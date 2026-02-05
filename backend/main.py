@@ -100,49 +100,73 @@ def generate_upload_url(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+from fastapi import BackgroundTasks
+
+def process_file_background(metadata: FileMetadata):
+    """Background task to extract text and update vector index."""
+    try:
+        print(f"Background Processing Started: {metadata.filename}")
+        
+        # 1. Update Status -> 'processing'
+        table.update_item(
+            Key={'file_id': metadata.filename},
+            UpdateExpression="set #s = :s",
+            ExpressionAttributeNames={'#s': 'status'},
+            ExpressionAttributeValues={':s': 'processing'}
+        )
+
+        # 2. Extract Text
+        text = extract_text_from_s3(metadata.filename)
+        
+        # 3. Index Vector
+        vector_store.add_document(text, metadata.filename)
+        
+        # 4. Update Status -> 'indexed'
+        table.update_item(
+            Key={'file_id': metadata.filename},
+            UpdateExpression="set #s = :s",
+            ExpressionAttributeNames={'#s': 'status'},
+            ExpressionAttributeValues={':s': 'indexed'}
+        )
+        print(f"Background Processing Complete: {metadata.filename}")
+
+    except Exception as e:
+        print(f"Background Processing Failed for {metadata.filename}: {e}")
+        # Update Status -> 'failed'
+        try:
+             table.update_item(
+                Key={'file_id': metadata.filename},
+                UpdateExpression="set #s = :s, #err = :err",
+                ExpressionAttributeNames={'#s': 'status', '#err': 'error_message'},
+                ExpressionAttributeValues={':s': 'failed', ':err': str(e)}
+            )
+        except:
+            pass
+
 @app.post("/files/ingest")
 def ingest_file(
     metadata: FileMetadata,
-    user: dict = Depends(require_contributor) # Protect
+    background_tasks: BackgroundTasks,
+    user: dict = Depends(require_contributor)
 ):
-  
     try:
-        # Save to DynamoDB
+        # Initial Save (Status: uploading/queued)
         table.put_item(
             Item={
-                'file_id': metadata.filename, 
+                'file_id': metadata.filename,
                 'filename': metadata.filename,
                 'content_type': metadata.content_type,
                 'size': metadata.size,
-                'status': 'uploading'
+                'status': 'queued',
+                'uploaded_by': user.get('username', 'unknown'),
+                'timestamp': str(os.getenv('timestamp', '')) # Optional
             }
         )
         
-        # Trigger Processing
-        try:
-            print(f"Processing {metadata.filename}...")
-            # FILE PROCESSOR (Smart Extraction)
-            text = extract_text_from_s3(metadata.filename)
-            
-            # If text is empty (e.g. Image), we still index the filename/metadata but vector might be mostly noise?
-            # Actually, standard vectorizers on empty string return a vector. 
-            # Ideally we might want to skip search indexing for pure images if no OCR?
-            # But user said "dont have to use textract for jpegs".
-            # So we index whatever text we got (which might be "" for JPEGs).
-            
-            vector_store.add_document(text, metadata.filename)
-            
-            # Update status
-            table.update_item(
-                Key={'file_id': metadata.filename},
-                UpdateExpression="set #s = :s",
-                ExpressionAttributeNames={'#s': 'status'},
-                ExpressionAttributeValues={':s': 'indexed'}
-            )
-            return {"status": "indexed", "file_id": metadata.filename}
-        except Exception as proc_error:
-            print(f"Processing failed: {proc_error}")
-            return {"status": "uploaded_but_failed_processing", "file_id": metadata.filename, "error": str(proc_error)}
+        # Trigger Background Task
+        background_tasks.add_task(process_file_background, metadata)
+        
+        return {"status": "queued", "message": "File accepted for background processing", "file_id": metadata.filename}
 
     except Exception as e:
         print(e)
