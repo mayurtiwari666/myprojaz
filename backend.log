@@ -210,3 +210,296 @@ INFO:     127.0.0.1:65358 - "GET /admin/audit-logs HTTP/1.1" 200 OK
 INFO:     127.0.0.1:65351 - "GET /admin/users HTTP/1.1" 200 OK
 INFO:     127.0.0.1:65356 - "GET /admin/stats HTTP/1.1" 200 OK
 INFO:     127.0.0.1:65358 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59911 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59912 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59914 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:59914 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:59913 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59914 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59912 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59911 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59914 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59911 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59912 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59914 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59912 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59912 - "OPTIONS /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59914 - "OPTIONS /tags HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59914 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:59914 - "OPTIONS /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59912 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59914 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59914 - "OPTIONS /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59912 - "OPTIONS /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59914 - "OPTIONS /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59929 - "OPTIONS /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59931 - "OPTIONS /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59932 - "OPTIONS /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59932 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59929 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59932 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59931 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59929 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:59914 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59932 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59929 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59931 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59933 - "OPTIONS /search?q=cemation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59933 - "GET /search?q=cemation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59933 - "OPTIONS /search?q=cremation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59933 - "GET /search?q=cremation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59948 - "OPTIONS /files/IMG_1347.jpeg/view HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59948 - "GET /files/IMG_1347.jpeg/view HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59953 - "OPTIONS /files/Varanasi_City_Detailed_Guide.pdf/view HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59953 - "GET /files/Varanasi_City_Detailed_Guide.pdf/view HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59960 - "OPTIONS /search?q=harishchandra%20ghat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59960 - "GET /search?q=harishchandra%20ghat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59966 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59977 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:59963 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59976 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59966 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59977 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59965 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59963 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59963 - "GET /files/Varanasi_City_Detailed_Guide.pdf/view HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59977 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59985 - "OPTIONS /search?q=The%20city%20is%20a%20global%20center%20for%20Indian%20classical%20music,%20dance,%20and%20philosophy.%20Renowned%20artists%20and%20thinkers%20have%20emerged%20from%20Varanasi HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59985 - "GET /search?q=The%20city%20is%20a%20global%20center%20for%20Indian%20classical%20music,%20dance,%20and%20philosophy.%20Renowned%20artists%20and%20thinkers%20have%20emerged%20from%20Varanasi HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59990 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:59989 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59990 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59989 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:59990 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59989 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59992 - "OPTIONS /files/Detailed_Human_Organ_Systems_Comprehensive.pdf/view HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59992 - "GET /files/Detailed_Human_Organ_Systems_Comprehensive.pdf/view HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60003 - "OPTIONS /search?q=nerves%20carry%20sensory%20information HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60003 - "GET /search?q=nerves%20carry%20sensory%20information HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62685 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62686 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62682 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:62681 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62682 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:62681 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62685 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62681 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62686 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62685 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62682 - "OPTIONS /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62699 - "OPTIONS /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62682 - "OPTIONS /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62700 - "OPTIONS /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62699 - "OPTIONS /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62700 - "OPTIONS /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62686 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62681 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62685 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62700 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62682 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62700 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62699 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62682 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62699 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62719 - "OPTIONS /tags HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62720 - "OPTIONS /tags HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62719 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:62719 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:62720 - "OPTIONS /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62719 - "OPTIONS /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62720 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62720 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63906 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63908 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63904 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:63904 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:63903 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63903 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63906 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63908 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63906 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63903 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63904 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63903 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63906 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64078 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:64077 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64078 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:64077 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64080 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64085 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64080 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64085 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64077 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64080 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50401 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50402 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50398 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:50781 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:50780 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50781 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:50783 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51199 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50996 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51225 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50780 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50817 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51199 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50996 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51666 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:51669 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51670 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51666 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:51665 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51665 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51670 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51669 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51665 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51666 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51670 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51665 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51670 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55000 - "OPTIONS /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55001 - "OPTIONS /tags HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55001 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55000 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55001 - "OPTIONS /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55000 - "OPTIONS /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55007 - "OPTIONS /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55008 - "OPTIONS /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55010 - "OPTIONS /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55011 - "OPTIONS /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55001 - "OPTIONS /admin/audit-logs HTTP/1.1" 200 OK
+Token validation failed: Signature has expired.
+Token validation failed: Signature has expired.
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:55008 - "GET /admin/stats HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55007 - "GET /admin/users HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55011 - "GET /admin/audit-logs HTTP/1.1" 401 Unauthorized
+Token validation failed: Signature has expired.
+Token validation failed: Signature has expired.
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:55001 - "GET /admin/stats HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55010 - "GET /admin/users HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55007 - "GET /admin/audit-logs HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55000 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55026 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55029 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55030 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55000 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55026 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55030 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55032 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55029 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55032 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55030 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55029 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55030 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55029 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55000 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55032 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55000 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55026 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55032 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55026 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55088 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55092 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55092 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55088 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55092 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55092 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55088 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55164 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55163 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55164 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55163 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55166 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55163 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55183 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55183 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55163 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55166 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55272 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55271 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55272 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55279 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55279 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55271 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55278 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55271 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55279 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55338 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55339 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55335 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55535 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55334 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55535 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55338 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55563 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55538 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55535 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55538 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55563 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55535 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55754 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55754 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:55752 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55756 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55754 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55760 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55760 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55752 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55756 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55756 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56644 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56645 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56641 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:56802 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:56801 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57351 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57177 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56640 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56804 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56644 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57736 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57738 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57736 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57738 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58057 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:58058 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:58053 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58058 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58057 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58054 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58057 - "GET /auth/me HTTP/1.1" 200 OK
+Failed to log activity: An error occurred (InvalidSignatureException) when calling the PutItem operation: Signature expired: 20260205T154115Z is now earlier than 20260205T154223Z (20260205T155723Z - 15 min.)
+INFO:     127.0.0.1:58233 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:58232 - "GET /files HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:58281 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:58290 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58283 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58283 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58381 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58235 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58423 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58381 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59598 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59599 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59595 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:59594 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59595 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:59594 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59599 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59598 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59594 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59599 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59598 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59594 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59599 - "POST /admin/log-login HTTP/1.1" 200 OK
