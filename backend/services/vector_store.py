@@ -63,28 +63,44 @@ class VectorStore:
             print(f"Failed to sync to S3: {e}")
 
     def embed_text(self, text: str) -> List[float]:
-        """Generates embeddings using AWS Bedrock (Titan)."""
-        body = json.dumps({
-            "inputText": text,
-        })
+        """Generates embeddings using AWS Bedrock (Titan) with retry logic."""
+        import time
+        retries = 0
+        max_retries = 5
         
-        response = self.bedrock.invoke_model(
-            body=body,
-            modelId="amazon.titan-embed-text-v1",
-            accept="application/json",
-            contentType="application/json"
-        )
+        while retries < max_retries:
+            try:
+                body = json.dumps({"inputText": text})
+                response = self.bedrock.invoke_model(
+                    body=body,
+                    modelId="amazon.titan-embed-text-v1",
+                    accept="application/json",
+                    contentType="application/json"
+                )
+                response_body = json.loads(response.get("body").read())
+                embedding = np.array(response_body.get("embedding"))
+                
+                # Normalize vector to L2 unit length
+                # This ensures L2 Distance correlates to Cosine Similarity
+                norm = np.linalg.norm(embedding)
+                if norm > 0:
+                     embedding = embedding / norm
+                     
+                return embedding.tolist()
+
+            except Exception as e:
+                # Handle Throttling specifically
+                if "ThrottlingException" in str(e):
+                    wait_time = (2 ** retries) # Exponential Backoff: 1, 2, 4, 8, 16 sec
+                    print(f"Bedrock Throttled. Retrying in {wait_time}s...")
+                    time.sleep(wait_time)
+                    retries += 1
+                else:
+                    # Other errors (e.g. Validation) -> Fail immediately
+                    print(f"Embedding Error: {e}")
+                    raise e
         
-        response_body = json.loads(response.get('body').read())
-        embedding = np.array(response_body.get('embedding'))
-        
-        # Normalize vector to L2 unit length
-        # This ensures L2 Distance correlates to Cosine Similarity
-        norm = np.linalg.norm(embedding)
-        if norm > 0:
-            embedding = embedding / norm
-            
-        return embedding.tolist()
+        raise Exception("Max Retries Exceeded for Bedrock Embedding")
 
     def _smart_chunk(self, text: str, chunk_size: int = 1000, overlap: int = 200) -> List[str]:
         """
