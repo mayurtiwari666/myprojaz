@@ -161,27 +161,35 @@ class VectorStore:
         self.sync_to_s3()
 
     def search(self, query: str, k: int = 5) -> List[Dict]:
-        try:
-            # 1. Fetch more candidates (3x) to allow for re-ranking
-            # This gives us a pool of semantically relevant chunks to filter/boost
-            candidates_k = k * 3
-            query_vector = self.embed_text(query)
-            distances, indices = self.index.search(np.array([query_vector]).astype('float32'), candidates_k)
+        # 1. Vector Search
+        query_vector = self.embed_text(query)
+        distances, indices = self.index.search(np.array([query_vector]).astype('float32'), k * 2) # Get more candidates
+        
+        results = []
+        seen_files = set()
+        
+        # Helper to add result
+        def add_result(metadata, score, method):
+            if not metadata:
+                return
+            file_id = metadata.get('source')
+            # Deduplicate by file (simple approach) or return chunks?
+            # Start with returning chunks implies file context
             
-            candidates = []
-            # Pre-process query for keyword matching (naive tokenization)
-            query_terms = set(query.lower().split())
+            # Let's simple return formatted dict
+            res = {
+                "score": float(score),
+                "source": metadata.get('source'),
+                "content": metadata.get('text'),
+                "metadata": metadata,
+                "method": method
+            }
+            results.append(res)
 
+        # Process Vector Results
+        if indices.size > 0:
             for i, idx in enumerate(indices[0]):
                 if idx != -1 and idx in self.metadata:
-                    # A. Semantic Score (0.0 - 1.0)
-                    # FAISS L2^2 -> Cosine Similarity approximation
-                    dist_sq = float(distances[0][i])
-                    similarity = 1 - (dist_sq / 2)
-                    semantic_score = max(0.0, min(1.0, similarity))
-                    
-                    # B. Keyword Boost (0.0 - 1.0)
-                    # ratio of query terms found in the chunk
                     text_lower = self.metadata[idx]["text"].lower()
                     matches = sum(1 for term in query_terms if term in text_lower)
                     keyword_score = matches / len(query_terms) if query_terms else 0.0
