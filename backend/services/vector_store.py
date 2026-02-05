@@ -161,61 +161,59 @@ class VectorStore:
         self.sync_to_s3()
 
     def search(self, query: str, k: int = 5) -> List[Dict]:
-        # 1. Vector Search
-        query_vector = self.embed_text(query)
-        distances, indices = self.index.search(np.array([query_vector]).astype('float32'), k * 2) # Get more candidates
-        
-        results = []
-        seen_files = set()
-        
-        # Helper to add result
-        def add_result(metadata, score, method):
-            if not metadata:
-                return
-            file_id = metadata.get('source')
-            # Deduplicate by file (simple approach) or return chunks?
-            # Start with returning chunks implies file context
+        try:
+            # 1. Vector Search
+            query_vector = self.embed_text(query)
+            # Fetch more candidates to allow keyword hits to surface
+            distances, indices = self.index.search(np.array([query_vector]).astype('float32'), k * 3) 
             
-            # Let's simple return formatted dict
-            res = {
-                "score": float(score),
-                "source": metadata.get('source'),
-                "content": metadata.get('text'),
-                "metadata": metadata,
-                "method": method
-            }
-            results.append(res)
+            results = []
+            seen_texts = set()
 
-        # Process Vector Results
-        if indices.size > 0:
-            for i, idx in enumerate(indices[0]):
-                if idx != -1 and idx in self.metadata:
-                    text_lower = self.metadata[idx]["text"].lower()
-                    matches = sum(1 for term in query_terms if term in text_lower)
-                    keyword_score = matches / len(query_terms) if query_terms else 0.0
-                    
-                    # C. Final Hybrid Score
-                    # Weight: 70% Semantic (Core Meaning) + 30% Keyword (Precision)
-                    # This ensures "Exact Match" bubbles up, but "Related Meaning" isn't lost.
-                    final_score = (semantic_score * 0.7) + (keyword_score * 0.3)
-                    
-                    candidates.append({
-                        "score": final_score, # Backend uses this for sorting
-                        "display_score": f"{final_score:.0%}", # UI Friendly
-                        "semantic_score": semantic_score,
-                        "keyword_score": keyword_score,
-                        "content": self.metadata[idx]["text"],
-                        "source": self.metadata[idx]["source"]
-                    })
-            
-            # Sort by Final Hybrid Score (Descending)
-            candidates.sort(key=lambda x: x['score'], reverse=True)
-            
-            # Return top K
-            return candidates[:k]
+            # 2. Collect Vector Results
+            if indices.size > 0:
+                for i, idx in enumerate(indices[0]):
+                    if idx != -1 and idx in self.metadata:
+                        meta = self.metadata[idx]
+                        # Score conversion: L2 Dist -> Similarity
+                        # L2 can be large. We use 1/(1+dist) for simple ranking.
+                        dist = float(distances[0][i])
+                        score = 1 / (1 + dist)
+                        
+                        res = {
+                            "score": score,
+                            "source": meta.get('source'),
+                            "content": meta.get('text'),
+                            "metadata": meta,
+                            "tags": ["Semantic"]
+                        }
+                        results.append(res)
+                        seen_texts.add(meta.get('text'))
+
+            # 3. Naive Keyword Scan (Boost Exact Phrase Match)
+            # This handles cases where Semantic Model fails (e.g. specialized terms)
+            q_lower = query.lower()
+            if len(q_lower) > 3: 
+                for idx, meta in self.metadata.items():
+                    text = meta.get('text', '')
+                    if q_lower in text.lower():
+                        if text not in seen_texts:
+                            res = {
+                                "score": 2.0, # Artificial Boost (Top Priority)
+                                "source": meta.get('source'),
+                                "content": text,
+                                "metadata": meta,
+                                "tags": ["Keyword Match"]
+                            }
+                            results.append(res)
+                            seen_texts.add(text) # Prevent dupes
+
+            # 4. Sort & Limit
+            results.sort(key=lambda x: x['score'], reverse=True)
+            return results[:k]
 
         except Exception as e:
-            print(f"Search failed: {e}")
+            print(f"Search error: {e}")
             return []
 
 # Global Interaction
