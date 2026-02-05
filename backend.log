@@ -503,3 +503,138 @@ INFO:     127.0.0.1:59599 - "GET /auth/me HTTP/1.1" 200 OK
 INFO:     127.0.0.1:59598 - "GET /tags/ HTTP/1.1" 200 OK
 INFO:     127.0.0.1:59594 - "POST /admin/log-login HTTP/1.1" 200 OK
 INFO:     127.0.0.1:59599 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60362 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60363 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60359 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60358 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60359 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60358 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60362 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60358 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60363 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60362 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60363 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60363 - "OPTIONS /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60359 - "OPTIONS /tags HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60359 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60363 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60359 - "OPTIONS /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60358 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60362 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60359 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60368 - "OPTIONS /search?q=cremation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60368 - "GET /search?q=cremation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60497 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60497 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60496 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60497 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60499 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60503 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60499 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60503 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60496 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60503 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60497 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60499 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60496 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60520 - "OPTIONS /files/upload-url?filename=Varanasi_City_Detailed_Guide.pdf&content_type=application%2Fpdf HTTP/1.1" 200 OK
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:60520 - "POST /files/upload-url?filename=Varanasi_City_Detailed_Guide.pdf&content_type=application%2Fpdf HTTP/1.1" 401 Unauthorized
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:60520 - "POST /files/upload-url?filename=Varanasi_City_Detailed_Guide.pdf&content_type=application%2Fpdf HTTP/1.1" 401 Unauthorized
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:60520 - "POST /files/upload-url?filename=Varanasi_City_Detailed_Guide.pdf&content_type=application%2Fpdf HTTP/1.1" 401 Unauthorized
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:60520 - "POST /files/upload-url?filename=Varanasi_City_Detailed_Guide.pdf&content_type=application%2Fpdf HTTP/1.1" 401 Unauthorized
+Token validation failed: Signature has expired.
+INFO:     127.0.0.1:60520 - "POST /files/upload-url?filename=Varanasi_City_Detailed_Guide.pdf&content_type=application%2Fpdf HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60538 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60538 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60520 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60540 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60542 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60520 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60538 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60542 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60540 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60538 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60544 - "POST /files/upload-url?filename=Varanasi_City_Detailed_Guide.pdf&content_type=application%2Fpdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60544 - "OPTIONS /files/ingest HTTP/1.1" 200 OK
+Processing Varanasi_City_Detailed_Guide.pdf...
+Extraction started for Varanasi_City_Detailed_Guide.pdf (.pdf)
+PDF detected: Varanasi_City_Detailed_Guide.pdf. Attempting pypdf first...
+pypdf extracted 3602 chars. Preview: 'Varanasi – The Eternal City of India\nVaranasi, also known as Kashi or Banaras, is one of the oldest continuously inhabited cities in the world. Situated\non the banks of the sacred River Ganga in Uttar'
+Syncing Vector Index to S3...
+Sync Complete.
+INFO:     127.0.0.1:60544 - "POST /files/ingest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60554 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60544 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60554 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60557 - "GET /search?q=cremation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60698 - "OPTIONS /files/upload-url?filename=Varanasi_City_Detailed_Guide.pdf&content_type=application%2Fpdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60698 - "POST /files/upload-url?filename=Varanasi_City_Detailed_Guide.pdf&content_type=application%2Fpdf HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60698 - "OPTIONS /files/ingest HTTP/1.1" 200 OK
+Processing Varanasi_City_Detailed_Guide.pdf...
+Extraction started for Varanasi_City_Detailed_Guide.pdf (.pdf)
+PDF detected: Varanasi_City_Detailed_Guide.pdf. Attempting pypdf first...
+pypdf extracted 3602 chars. Preview: 'Varanasi – The Eternal City of India\nVaranasi, also known as Kashi or Banaras, is one of the oldest continuously inhabited cities in the world. Situated\non the banks of the sacred River Ganga in Uttar'
+Syncing Vector Index to S3...
+Sync Complete.
+INFO:     127.0.0.1:60698 - "POST /files/ingest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60698 - "OPTIONS /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60727 - "OPTIONS /tags HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60727 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60698 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60727 - "OPTIONS /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60727 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60727 - "OPTIONS /search?q=cremation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60727 - "GET /search?q=cremation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60782 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60783 - "OPTIONS /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60779 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60779 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60778 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60779 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60779 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60778 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60782 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60783 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60779 - "OPTIONS /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60778 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60783 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60795 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60782 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60778 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60795 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60779 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60778 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60782 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60783 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60795 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60783 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60984 - "OPTIONS /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60986 - "OPTIONS /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60987 - "OPTIONS /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60989 - "OPTIONS /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60991 - "OPTIONS /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60992 - "OPTIONS /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60987 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:60989 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60991 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60987 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60991 - "GET /admin/audit-logs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61012 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61013 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61021 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:61020 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61021 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61021 - "GET /search?q=cremation%20grounds HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61021 - "OPTIONS /search?q=cremation HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61021 - "GET /search?q=cremation HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60984 - "GET /admin/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60992 - "GET /admin/users HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60986 - "GET /search?q=cremation%20grounds HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [55030]
