@@ -129,7 +129,8 @@ class VectorStore:
         text = " ".join(text.split()) # Remove excessive whitespace
         
         # Smart Chunking
-        chunks = self._smart_chunk(text, chunk_size=400, overlap=100)
+        # Use larger overlap to prevent splitting phrases like "cremation grounds"
+        chunks = self._smart_chunk(text, chunk_size=400, overlap=200) 
         
         if not chunks:
             return
@@ -145,6 +146,7 @@ class VectorStore:
                 valid_chunks.append(chunk)
             except Exception as e:
                 print(f"Error embedding chunk: {e}")
+                continue
 
         if not embeddings:
             return
@@ -164,7 +166,7 @@ class VectorStore:
         try:
             # 1. Vector Search
             query_vector = self.embed_text(query)
-            # Fetch more candidates to allow keyword hits to surface
+            # Fetch more candidates
             distances, indices = self.index.search(np.array([query_vector]).astype('float32'), k * 3) 
             
             results = []
@@ -190,23 +192,31 @@ class VectorStore:
                         results.append(res)
                         seen_texts.add(meta.get('text'))
 
-            # 3. Naive Keyword Scan (Boost Exact Phrase Match)
-            # This handles cases where Semantic Model fails (e.g. specialized terms)
+            # 3. Smart Keyword Fallback (Match ALL terms)
+            # This catches cases where "cremation" and "grounds" are in the chunk,
+            # but the vector model missed the semantic connection.
             q_lower = query.lower()
-            if len(q_lower) > 3: 
+            terms = q_lower.split()
+            
+            # Only run if we have meaningful terms (avoid matching "the")
+            meaningful_terms = [t for t in terms if len(t) > 2]
+            
+            if meaningful_terms:
                 for idx, meta in self.metadata.items():
-                    text = meta.get('text', '')
-                    if q_lower in text.lower():
-                        if text not in seen_texts:
+                    text = meta.get('text', '').lower()
+                    # Check if ALL terms are present in this chunk
+                    if all(term in text for term in meaningful_terms):
+                        original_text = meta.get('text', '')
+                        if original_text not in seen_texts:
                             res = {
-                                "score": 2.0, # Artificial Boost (Top Priority)
+                                "score": 1.5, # Boost (High Priority)
                                 "source": meta.get('source'),
-                                "content": text,
+                                "content": original_text,
                                 "metadata": meta,
                                 "tags": ["Keyword Match"]
                             }
                             results.append(res)
-                            seen_texts.add(text) # Prevent dupes
+                            seen_texts.add(original_text)
 
             # 4. Sort & Limit
             results.sort(key=lambda x: x['score'], reverse=True)
