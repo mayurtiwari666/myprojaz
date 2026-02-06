@@ -257,7 +257,7 @@ function Dashboard({ user, signOut }) {
           <div className="glass p-1.5 rounded-2xl inline-flex shadow-lg shadow-gray-200/50">
             {[
               { id: 'upload', icon: UploadCloud, label: 'Upload', visible: isContributor },
-              { id: 'browser', icon: Search, label: 'Deep Search', visible: true },
+              { id: 'browser', icon: Search, label: 'Search', visible: true },
               { id: 'admin', icon: ShieldCheck, label: 'Admin Hub', visible: isAdmin },
             ].filter(t => t.visible).map((tab) => (
               <button
@@ -300,7 +300,7 @@ function Dashboard({ user, signOut }) {
                         className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${searchMode === 'metadata' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'
                           }`}
                       >
-                        Metadata Search
+                        Normal Search
                       </button>
                       <button
                         onClick={() => { setSearchMode('semantic'); setSearchResults(null); setSearchQuery(''); }}
