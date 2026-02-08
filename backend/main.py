@@ -8,8 +8,8 @@ import os
 from backend.services.file_processor import extract_text_from_s3
 from backend.services.vector_store import vector_store
 from backend.middleware.logging import ActivityLoggingMiddleware
-from backend.routers import admin, tags
-from backend.auth import require_contributor, get_current_user
+from backend.routers import admin, tags, storage_paths
+from backend.auth import require_contributor, get_current_user, require_admin
 from pydantic import BaseModel
 from backend.config import settings
 
@@ -34,6 +34,7 @@ app.add_middleware(
 # Routers
 app.include_router(admin.router)
 app.include_router(tags.router)
+app.include_router(storage_paths.router)
 
 # AWS Clients
 s3 = boto3.client('s3', region_name='us-east-1')
@@ -51,10 +52,11 @@ ALLOWED_TYPES = {
     'image/jpeg',
     'image/jpg',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', # docx
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation' # pptx
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation', # pptx
+    'text/plain'
 }
 
-ALLOWED_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.docx', '.doc', '.pptx', '.ppt'}
+ALLOWED_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.docx', '.doc', '.pptx', '.ppt', '.txt'}
 
 @app.get("/")
 def read_root():
@@ -67,10 +69,25 @@ def read_current_user(user: dict = Depends(get_current_user)):
     return user
 
 @app.get("/files")
-def list_files():
+def list_files(trash: bool = False, storage_path: str = None):
     try:
         response = table.scan()
-        return response.get('Items', [])
+        all_items = response.get('Items', [])
+        
+        # Filter Logic
+        if trash:
+            # Show ONLY deleted items
+            return [item for item in all_items if item.get('is_deleted') is True]
+        else:
+            # Show ONLY active items (is_deleted is False or None)
+            active = [item for item in all_items if not item.get('is_deleted')]
+            
+            # Filter by Storage Path
+            if storage_path:
+                return [item for item in active if item.get('storage_path') == storage_path]
+                
+            return active
+            
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -118,15 +135,30 @@ def process_file_background(metadata: FileMetadata):
         # 2. Extract Text
         text = extract_text_from_s3(metadata.filename)
         
+        # 2a. PII Analysis (Safe Mode)
+        from backend.services.file_processor import analyze_sensitivity
+        pii_flags = analyze_sensitivity(text)
+        if pii_flags:
+            print(f"PII Detected for {metadata.filename}: {pii_flags}")
+
         # 3. Index Vector
         vector_store.add_document(text, metadata.filename)
         
-        # 4. Update Status -> 'indexed'
+        # 4. Update Status -> 'indexed' (and save PII flags)
+        update_expr = "set #s = :s"
+        expr_values = {':s': 'indexed'}
+        expr_names = {'#s': 'status'}
+
+        if pii_flags:
+            update_expr += ", #pii = :pii"
+            expr_values[':pii'] = pii_flags
+            expr_names['#pii'] = 'pii_flags'
+
         table.update_item(
             Key={'file_id': metadata.filename},
-            UpdateExpression="set #s = :s",
-            ExpressionAttributeNames={'#s': 'status'},
-            ExpressionAttributeValues={':s': 'indexed'}
+            UpdateExpression=update_expr,
+            ExpressionAttributeNames=expr_names,
+            ExpressionAttributeValues=expr_values
         )
         print(f"Background Processing Complete: {metadata.filename}")
 
@@ -196,9 +228,18 @@ def get_file_versions(filename: str):
         ]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+from backend.services.logging_service import log_audit_event
+
 @app.get("/files/{filename}/view")
 def view_file(filename: str, user: dict = Depends(require_contributor)):
     try:
+        # Audit Log: Preview
+        log_audit_event(
+            user=user.get('username', 'unknown'),
+            action='FILE_PREVIEW',
+            details='User previewed file (inline)',
+            related_file=filename
+        )
         # Generate presigned URL for inline viewing
         url = s3.generate_presigned_url(
             'get_object',
@@ -216,6 +257,13 @@ def view_file(filename: str, user: dict = Depends(require_contributor)):
 @app.get("/files/{filename}/download")
 def download_file(filename: str, user: dict = Depends(require_contributor)):
     try:
+        # Audit Log: Download
+        log_audit_event(
+            user=user.get('username', 'unknown'),
+            action='FILE_DOWNLOAD',
+            details='User downloaded file (attachment)',
+            related_file=filename
+        )
         # Generate presigned URL for downloading (attachment)
         url = s3.generate_presigned_url(
             'get_object',
@@ -233,16 +281,40 @@ def download_file(filename: str, user: dict = Depends(require_contributor)):
 @app.delete("/files/{filename}")
 def delete_file(filename: str, user: dict = Depends(require_contributor)):
     try:
-        # 1. Delete from S3
+        log_audit_event(user.get('username', 'unknown'), 'FILE_DELETE', 'Soft Deleted', filename)
+        # Soft Delete: Mark as deleted in DynamoDB (do not remove from S3)
+        table.update_item(
+            Key={'file_id': filename},
+            UpdateExpression="set #d = :d, #dt = :dt",
+            ExpressionAttributeNames={'#d': 'is_deleted', '#dt': 'deleted_at'},
+            ExpressionAttributeValues={':d': True, ':dt': str(os.getenv('timestamp', ''))}
+        )
+        return {"status": "soft_deleted", "filename": filename}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/files/{filename}/restore")
+def restore_file(filename: str, user: dict = Depends(require_contributor)):
+    try:
+        log_audit_event(user.get('username', 'unknown'), 'FILE_RESTORE', 'Restored from Trash', filename)
+        # Restore: Unmark deletion
+        table.update_item(
+            Key={'file_id': filename},
+            UpdateExpression="set #d = :d",
+            ExpressionAttributeNames={'#d': 'is_deleted'},
+            ExpressionAttributeValues={':d': False}
+        )
+        return {"status": "restored", "filename": filename}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/files/{filename}/permanent")
+def delete_file_permanent(filename: str, user: dict = Depends(require_admin)):
+    try:
+        log_audit_event(user.get('username', 'unknown'), 'FILE_PERMANENT_DELETE', 'Permanently Deleted from S3', filename)
+        # Hard Delete: Remove from S3 and DynamoDB
         s3.delete_object(Bucket=BUCKET_NAME, Key=filename)
-        
-        # 2. Delete from DynamoDB
         table.delete_item(Key={'file_id': filename})
-        
-        # 3. Note: Vector Store deletion is skipped for stability/simplicity
-        # The file will "disappear" from UI (DB) and Storage (S3).
-        # Search results might linger until next re-index, but will fail to load, which is acceptable.
-        
-        return {"status": "deleted", "filename": filename}
+        return {"status": "permanently_deleted", "filename": filename}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

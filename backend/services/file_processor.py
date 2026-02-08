@@ -11,6 +11,21 @@ from pdf2image import convert_from_bytes
 s3_client = boto3.client('s3', region_name=settings.AWS_REGION)
 
 # NOTE: Textract Client removed in favor of Tesseract (Local OCR)
+from backend.services.pii_detector import get_pii_detector
+
+def analyze_sensitivity(text: str) -> list:
+    """
+    Safely analyzes text for PII. Returns list of flags (e.g. ['EMAIL_ADDRESS']).
+    Fail Open: Returns [] if detector fails, ensuring upload never breaks.
+    """
+    try:
+        detector = get_pii_detector()
+        # Optimization: Limit PII analysis to first 100KB to prevent timeouts on large files
+        path_limited_text = text[:100000] 
+        return detector.analyze(path_limited_text)
+    except Exception as e:
+        print(f"PII Analysis Failed: {e}")
+        return []
 
 def extract_text_from_s3(file_key: str) -> str:
     """

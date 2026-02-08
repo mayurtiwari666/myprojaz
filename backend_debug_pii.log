@@ -1,0 +1,26 @@
+INFO:faiss.loader:Loading faiss.
+INFO:faiss.loader:Successfully loaded faiss.
+INFO:     Started server process [8274]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+Downloading Vector Index from S3...
+Download Complete.
+INFO:     127.0.0.1:50727 - "POST /files/upload-url?filename=test_pii.txt&content_type=text%2Fplain HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:50727 - "POST /files/upload-url?filename=test_pii.txt&content_type=text%2Fplain HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:50739 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:50739 - "GET /tags HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:50741 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50727 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50727 - "GET /files HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50741 - "GET /auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50745 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50745 - "GET /tags/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50739 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50741 - "POST /admin/log-login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50750 - "POST /files/upload-url?filename=test_pii.txt&content_type=text%2Fplain HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:50750 - "POST /files/upload-url?filename=test_pii.txt&content_type=text%2Fplain HTTP/1.1" 400 Bad Request
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [8274]

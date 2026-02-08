@@ -71,3 +71,46 @@ def assign_tags(req: AssignTagRequest, user: dict = Depends(require_contributor)
         return {"status": "success", "tags": req.tags}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+class BulkAssignTagRequest(BaseModel):
+    file_ids: list[str]
+    tags: list[str]
+    mode: str = 'add' # 'add' or 'replace'
+
+@router.post("/bulk-assign")
+def bulk_assign_tags(req: BulkAssignTagRequest, user: dict = Depends(require_contributor)):
+    """
+    Assigns tags to multiple files.
+    Mode 'add': Appends tags.
+    Mode 'replace': Overwrites tags.
+    """
+    try:
+        updated_count = 0
+        for file_id in req.file_ids:
+            if req.mode == 'replace':
+                files_table.update_item(
+                    Key={'file_id': file_id},
+                    UpdateExpression="set tags = :t",
+                    ExpressionAttributeValues={':t': req.tags}
+                )
+            else:
+                # Add mode: Read -> Merge -> Write
+                item_resp = files_table.get_item(Key={'file_id': file_id})
+                item = item_resp.get('Item')
+                if not item: continue
+                
+                current_tags = item.get('tags', [])
+                # Merge and unique
+                new_set = set(current_tags + req.tags)
+                final_tags = list(new_set)
+                
+                files_table.update_item(
+                    Key={'file_id': file_id},
+                    UpdateExpression="set tags = :t",
+                    ExpressionAttributeValues={':t': final_tags}
+                )
+            updated_count += 1
+            
+        return {"status": "success", "updated": updated_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

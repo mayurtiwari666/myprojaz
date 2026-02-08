@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { FileText, History, Eye, Tag, Plus, RotateCcw, ChevronDown, Check, Trash2, Download } from 'lucide-react';
+import { FileText, History, Eye, Tag, Plus, RotateCcw, ChevronDown, Check, Trash2, Download, Shield, ShieldAlert } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
 const API_URL = import.meta.env.PROD ? "" : "http://localhost:8000";
 
-export default function FileCard({ file, viewingVersions, versions, onPreview, onFetchVersions, availableTags, onUpdateFileTags, isContributor, onDelete, onDownload }) {
+export default function FileCard({ file, viewingVersions, versions, onPreview, onFetchVersions, availableTags, onUpdateFileTags, isContributor, onDelete, onDownload, isTrash, onRestore, isSelected, onToggleSelect }) {
     const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
+    const [showPii, setShowPii] = useState(false);
 
     const handleAssignTag = async (tagName) => {
         try {
@@ -34,8 +35,22 @@ export default function FileCard({ file, viewingVersions, versions, onPreview, o
     };
 
     return (
-        <div className={`glass-card p-5 rounded-2xl flex flex-col group transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 border border-transparent hover:border-indigo-100 ${isTagDropdownOpen ? 'relative z-30' : 'relative z-0'}`}>
-            <div className="flex items-start justify-between w-full">
+        <div className={`glass-card p-5 rounded-2xl flex flex-col group transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 border ${isSelected ? 'border-indigo-500 ring-4 ring-indigo-500/10' : 'border-transparent hover:border-indigo-100'} ${isTagDropdownOpen ? 'relative z-30' : 'relative z-0'}`}>
+
+            {/* CHECKBOX: Contributor Only, Not Trash, Top-Left */}
+            {!isTrash && isContributor && (
+                <div className="absolute top-4 left-4 z-20">
+                    <input
+                        type="checkbox"
+                        checked={!!isSelected}
+                        onChange={() => onToggleSelect(file.file_id)}
+                        className="w-5 h-5 rounded-md border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer shadow-sm opacity-0 group-hover:opacity-100 transition-opacity data-[checked=true]:opacity-100"
+                        data-checked={!!isSelected}
+                    />
+                </div>
+            )}
+
+            <div className="flex items-start justify-between w-full pl-8"> {/* Added padding-left to avoid overlap */}
                 <div className="flex items-start gap-5">
                     {/* Icon */}
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
@@ -46,8 +61,47 @@ export default function FileCard({ file, viewingVersions, versions, onPreview, o
                     <div>
                         <h4 className="font-bold text-gray-900 text-lg line-clamp-1">{file.filename}</h4>
                         <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                            <span className="text-xs font-medium text-gray-500 px-2 py-0.5 bg-gray-100 rounded-md">v1.0</span>
+
                             <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
+
+                            {/* PII Warning */}
+
+                            {/* PII Toggle */}
+                            {file.status === 'indexed' && (
+                                <div className="flex items-center">
+                                    {file.pii_flags && file.pii_flags.length > 0 ? (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setShowPii(!showPii); }}
+                                            className={`flex items-center gap-0.5 px-1 py-0 rounded text-[7px] font-bold border transition-colors leading-none h-4 ${showPii
+                                                ? 'bg-red-50 text-red-600 border-red-200'
+                                                : 'bg-white text-gray-400 border-gray-100 hover:border-red-200 hover:text-red-500 hover:bg-red-50/50'
+                                                }`}
+                                        >
+                                            <ShieldAlert className="w-2 h-2" />
+                                            {showPii ? 'Hide' : 'PII'}
+                                        </button>
+                                    ) : (
+                                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold text-gray-400 border border-gray-100 bg-gray-50/50">
+                                            <Shield className="w-3 h-3" />
+                                            No PII
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Expanded PII Details */}
+                            {showPii && file.pii_flags && file.pii_flags.length > 0 && (
+                                <div className="w-full mt-2 p-2 bg-red-50 rounded-lg border border-red-100 text-xs text-red-700 animate-in slide-in-from-top-1">
+                                    <p className="font-bold mb-1">Sensitive Data Found:</p>
+                                    <div className="flex flex-wrap gap-1">
+                                        {file.pii_flags.map((flag, i) => (
+                                            <span key={i} className="px-1.5 py-0.5 bg-white rounded border border-red-200 text-[10px]">
+                                                {flag}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Tag Chips */}
                             {file.tags && file.tags.map(tagName => {
@@ -68,93 +122,118 @@ export default function FileCard({ file, viewingVersions, versions, onPreview, o
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                    {/* Preview Button */}
-                    <button
-                        onClick={() => onPreview(file)}
-                        className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                        title="Quick Look"
-                    >
-                        <Eye className="w-5 h-5" />
-                    </button>
-
-                    {/* Download Button (Contributors/Admins) */}
-                    {isContributor && (
-                        <button
-                            onClick={() => onDownload(file.filename)}
-                            className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                            title="Download File"
-                        >
-                            <Download className="w-5 h-5" />
-                        </button>
-                    )}
-
-                    {/* Versions Button (Contributors/Admins only) */}
-                    {isContributor && (
-                        <button
-                            onClick={() => onFetchVersions(file.filename)}
-                            className={`p-2 rounded-lg transition-all ${viewingVersions === file.filename ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
-                            title="View History"
-                        >
-                            <History className="w-5 h-5" />
-                        </button>
-                    )}
-
-                    {/* Delete Button (Contributors/Admins) */}
-                    {isContributor && (
-                        <button
-                            onClick={() => onDelete(file.filename)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                            title="Delete File"
-                        >
-                            <Trash2 className="w-5 h-5" />
-                        </button>
-                    )}
-
-                    {/* Tags Dropdown - RESTRICTED TO CONTRIBUTORS */}
-                    {isContributor && (
-                        <div className="relative">
+                    {/* TRASH MODE ACTIONS */}
+                    {isTrash ? (
+                        <>
                             <button
-                                onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
-                                className={`p-2 rounded-lg transition-all ${isTagDropdownOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'}`}
-                                title="Manage Tags"
+                                onClick={() => onRestore(file.filename)}
+                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all flex items-center gap-2"
+                                title="Restore File"
                             >
-                                <Tag className="w-5 h-5" />
+                                <RotateCcw className="w-5 h-5" />
+                                <span className="text-xs font-bold hidden group-hover:block">RESTORE</span>
+                            </button>
+                            <button
+                                onClick={() => onDelete(file.filename)}
+                                className="p-2 text-red-400 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all flex items-center gap-2"
+                                title="Delete Forever"
+                            >
+                                <Trash2 className="w-5 h-5" />
+                                <span className="text-xs font-bold hidden group-hover:block">FOREVER</span>
+                            </button>
+                        </>
+                    ) : (
+                        /* NORMAL MODE ACTIONS */
+                        <>
+                            {/* Preview Button */}
+                            <button
+                                onClick={() => onPreview(file)}
+                                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                title="Quick Look"
+                            >
+                                <Eye className="w-5 h-5" />
                             </button>
 
-                            {isTagDropdownOpen && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-40"
-                                        onClick={() => setIsTagDropdownOpen(false)}
-                                    ></div>
-                                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 p-2 animate-in fade-in zoom-in-95 duration-200">
-                                        <h6 className="text-xs font-bold text-gray-400 uppercase px-2 py-1 mb-1">Assign Tags</h6>
-                                        {availableTags.length === 0 ? (
-                                            <p className="text-xs text-gray-500 px-2 py-2 italic text-center">No tags created yet.</p>
-                                        ) : (
-                                            <div className="max-h-48 overflow-y-auto space-y-1">
-                                                {availableTags.map(tag => {
-                                                    const isSelected = file.tags?.includes(tag.name);
-                                                    return (
-                                                        <button
-                                                            key={tag.name}
-                                                            onClick={() => handleAssignTag(tag.name)}
-                                                            className="w-full text-left px-2 py-1.5 rounded-lg text-sm hover:bg-gray-50 flex items-center justify-between group/item"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }}></div>
-                                                                <span className="text-gray-700 font-medium">{tag.name}</span>
-                                                            </div>
-                                                            {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600" />}
-                                                        </button>
-                                                    )
-                                                })}
-                                            </div>
-                                        )}
-                                    </div>
-                                </>
+                            {/* Download Button (Contributors/Admins) */}
+                            {isContributor && (
+                                <button
+                                    onClick={() => onDownload(file.filename)}
+                                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                    title="Download File"
+                                >
+                                    <Download className="w-5 h-5" />
+                                </button>
                             )}
-                        </div>
+
+                            {/* Versions Button (Contributors/Admins only) */}
+                            {isContributor && (
+                                <button
+                                    onClick={() => onFetchVersions(file.filename)}
+                                    className={`p-2 rounded-lg transition-all ${viewingVersions === file.filename ? 'bg-indigo-50 text-indigo-600' : 'text-gray-400 hover:text-indigo-600 hover:bg-indigo-50'}`}
+                                    title="View History"
+                                >
+                                    <History className="w-5 h-5" />
+                                </button>
+                            )}
+
+                            {/* Delete Button (Contributors/Admins) */}
+                            {isContributor && (
+                                <button
+                                    onClick={() => onDelete(file.filename)}
+                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                    title="Delete File"
+                                >
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            )}
+
+                            {/* Tags Dropdown - RESTRICTED TO CONTRIBUTORS */}
+                            {isContributor && (
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setIsTagDropdownOpen(!isTagDropdownOpen)}
+                                        className={`p-2 rounded-lg transition-all ${isTagDropdownOpen ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'}`}
+                                        title="Manage Tags"
+                                    >
+                                        <Tag className="w-5 h-5" />
+                                    </button>
+
+                                    {isTagDropdownOpen && (
+                                        <>
+                                            <div
+                                                className="fixed inset-0 z-40"
+                                                onClick={() => setIsTagDropdownOpen(false)}
+                                            ></div>
+                                            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 p-2 animate-in fade-in zoom-in-95 duration-200">
+                                                <h6 className="text-xs font-bold text-gray-400 uppercase px-2 py-1 mb-1">Assign Tags</h6>
+                                                {availableTags.length === 0 ? (
+                                                    <p className="text-xs text-gray-500 px-2 py-2 italic text-center">No tags created yet.</p>
+                                                ) : (
+                                                    <div className="max-h-48 overflow-y-auto space-y-1">
+                                                        {availableTags.map(tag => {
+                                                            const isSelected = file.tags?.includes(tag.name);
+                                                            return (
+                                                                <button
+                                                                    key={tag.name}
+                                                                    onClick={() => handleAssignTag(tag.name)}
+                                                                    className="w-full text-left px-2 py-1.5 rounded-lg text-sm hover:bg-gray-50 flex items-center justify-between group/item"
+                                                                >
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: tag.color }}></div>
+                                                                        <span className="text-gray-700 font-medium">{tag.name}</span>
+                                                                    </div>
+                                                                    {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600" />}
+                                                                </button>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

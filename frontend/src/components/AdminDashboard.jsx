@@ -5,6 +5,8 @@ import {
     BarChart2, Clock
 } from 'lucide-react';
 import TagManager from './TagManager';
+import StoragePathManager from './StoragePathManager';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const API_URL = import.meta.env.PROD ? "" : "http://localhost:8000";
 
@@ -127,6 +129,12 @@ export default function AdminDashboard() {
                 >
                     Tags
                 </button>
+                <button
+                    onClick={() => setActiveTab('paths')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'paths' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                    Storage Paths
+                </button>
             </div>
             {/* Content Switcher */}
             {activeTab === 'overview' && (
@@ -135,6 +143,35 @@ export default function AdminDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <StatCard icon={Users} label="Active Users" value={stats?.online_users_count || 0} color="emerald" />
                         <StatCard icon={Database} label="Storage Used" value={stats?.storage_used || "0 KB"} color="purple" />
+                    </div>
+
+                    {/* File Type Distribution */}
+                    <div className="glass p-8 rounded-[2rem] border border-white/50 shadow-xl shadow-indigo-500/5">
+                        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                            <BarChart2 className="w-5 h-5 text-indigo-500" />
+                            File Type Distribution
+                        </h3>
+                        <div className="h-64 w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={Object.entries(stats?.file_types || {}).map(([name, value]) => ({ name, value }))}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        {Object.entries(stats?.file_types || {}).map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={['#818cf8', '#34d399', '#f472b6', '#fbbf24'][index % 4]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                    <Legend />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
 
                     {/* Active Users List (Embedded in Overview) */}
@@ -227,6 +264,11 @@ export default function AdminDashboard() {
             {
                 activeTab === 'tags' && (
                     <TagManager />
+                )
+            }
+            {
+                activeTab === 'paths' && (
+                    <StoragePathManager />
                 )
             }
         </div >

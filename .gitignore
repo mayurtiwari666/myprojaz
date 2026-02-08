@@ -9,4 +9,12 @@ dist/
 .coverage
 htmlcov/
 faiss_index.bin
-.agent/
+
+# Experimental & Debug Scripts
+scripts/debug_*.py
+scripts/test_*.py
+scripts/upload_*.py
+
+# Local Secrets
+*.env
+*.pem

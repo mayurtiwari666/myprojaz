@@ -37,28 +37,35 @@ def get_dashboard_stats():
         files_response = files_table.scan(Select='COUNT')
         total_files = files_response['Count']
         
-        # Storage Calculation
-        storage_bytes = 0
-        scan_kwargs = {'ProjectionExpression': 'file_size'} # Note: attribute is 'size' in our DB
-        done = False
-        start_key = None
+        # User Count (Cognito - Total Registered)
+        users = cognito.list_users(UserPoolId=settings.COGNITO_USER_POOL_ID)
+        total_registered = len(users.get('Users', []))
         
-        # Scan for full storage sum (optimized scan)
-        # Note: If 'size' attribute exists. Let's check our schema. 
-        # Previous Upload saves 'size'.
+        # File Type Distribution & Storage
         files = files_table.scan()
-        for item in files.get('Items', []):
+        all_items = files.get('Items', [])
+        
+        storage_bytes = 0
+        file_types = {}
+        
+        for item in all_items:
+            # Skip deleted
+            if item.get('is_deleted'): continue
+            
             storage_bytes += int(item.get('size', 0))
+            
+            # Count Types
+            filename = item.get('filename', '')
+            ext = 'other'
+            if '.' in filename:
+                ext = filename.split('.')[-1].upper()
+            file_types[ext] = file_types.get(ext, 0) + 1
             
         storage_display = "0 MB"
         if storage_bytes < 1024 * 1024:
              storage_display = f"{round(storage_bytes / 1024, 2)} KB"
         else:
              storage_display = f"{round(storage_bytes / (1024 * 1024), 2)} MB"
-        
-        # User Count (Cognito - Total Registered)
-        users = cognito.list_users(UserPoolId=settings.COGNITO_USER_POOL_ID)
-        total_registered = len(users.get('Users', []))
 
         # Online Users (Activity in last 15 mins)
         now = datetime.datetime.utcnow()
@@ -86,6 +93,7 @@ def get_dashboard_stats():
             "online_users_count": online_count,
             "online_users_list": list(recent_users),
             "storage_used": storage_display,
+            "file_types": file_types,
             "system_health": "Healthy"
         }
     except Exception as e:
@@ -151,12 +159,24 @@ def get_audit_logs():
         aws = get_aws_resources()
         activity_table = aws['activity']
 
-        # Scan logs
-        response = activity_table.scan(Limit=100) # Cap at 100 for now
+        # Scan logs with pagination (Scan Limit is 1MB)
+        response = activity_table.scan()
         items = response.get('Items', [])
+        
+        while 'LastEvaluatedKey' in response:
+            response = activity_table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+            items.extend(response.get('Items', []))
+
         # Sort by timestamp desc
         items.sort(key=lambda x: x['timestamp'], reverse=True)
-        return items
+         
+        # Filter Noise (GET/OPTIONS/HEAD)
+        filtered_items = [
+            i for i in items 
+            if i.get('method') not in ['GET', 'OPTIONS', 'HEAD']
+        ]
+
+        return filtered_items[:100]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

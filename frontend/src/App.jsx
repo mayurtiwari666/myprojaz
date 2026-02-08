@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UploadCloud, Search, FileText, LogOut, Loader2, History, RotateCcw, ShieldCheck } from 'lucide-react';
+import { UploadCloud, Search, FileText, LogOut, Loader2, History, RotateCcw, ShieldCheck, Tag, X, Trash2, Folder } from 'lucide-react';
 import { Authenticator } from '@aws-amplify/ui-react';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import '@aws-amplify/ui-react/styles.css';
@@ -36,6 +36,103 @@ function Dashboard({ user, signOut }) {
   const [previewFile, setPreviewFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  // Bulk Selection State
+  const [selectedFileIds, setSelectedFileIds] = useState(new Set());
+  const [isBulkTagModalOpen, setIsBulkTagModalOpen] = useState(false);
+  const [isBulkMoveModalOpen, setIsBulkMoveModalOpen] = useState(false);
+  const [targetMovePath, setTargetMovePath] = useState('');
+
+  // Storage Paths State
+  const [storagePaths, setStoragePaths] = useState([]);
+  const [selectedStoragePath, setSelectedStoragePath] = useState(null);
+
+  const handleToggleSelect = (fileId) => {
+    const newSet = new Set(selectedFileIds);
+    if (newSet.has(fileId)) {
+      newSet.delete(fileId);
+    } else {
+      newSet.add(fileId);
+    }
+    setSelectedFileIds(newSet);
+  };
+
+  const handleClearSelection = () => {
+    setSelectedFileIds(new Set());
+  };
+
+  const handleBulkTag = async (tagsToAdd) => {
+    try {
+      await axios.post(`${API_URL}/tags/bulk-assign`, {
+        file_ids: Array.from(selectedFileIds),
+        tags: tagsToAdd,
+        mode: 'add'
+      });
+
+      // Optimistic Update
+      setFiles(prev => prev.map(f => {
+        if (selectedFileIds.has(f.file_id)) {
+          const current = new Set(f.tags || []);
+          tagsToAdd.forEach(t => current.add(t));
+          return { ...f, tags: Array.from(current) };
+        }
+        return f;
+      }));
+
+      handleClearSelection();
+      setIsBulkTagModalOpen(false);
+
+      // Delay to allow backend consistency
+      setTimeout(() => {
+        fetchTags();
+      }, 500);
+
+      alert("Tags assigned to " + selectedFileIds.size + " files.");
+    } catch (e) {
+      console.error("Bulk tag failed", e);
+      alert("Failed to assign tags");
+    }
+  };
+
+  const handleBulkMove = async () => {
+    try {
+      await axios.post(`${API_URL}/storage-paths/bulk-assign`, {
+        file_ids: Array.from(selectedFileIds),
+        target_path: targetMovePath || null
+      });
+
+      // Optimistic Update
+      const newPath = targetMovePath || null;
+      setFiles(prev => prev.map(f =>
+        selectedFileIds.has(f.file_id) ? { ...f, storage_path: newPath } : f
+      ));
+
+      // Update Search Results too
+      if (searchResults) {
+        setSearchResults(prev => prev.map(f =>
+          selectedFileIds.has(f.file_id) ? { ...f, storage_path: newPath } : f
+        ));
+      }
+
+      // Refresh if filtering by path
+      if (selectedStoragePath) {
+        setFiles(prev => prev.filter(f => !selectedFileIds.has(f.file_id)));
+      } else {
+        fetchFiles(activeTab === 'trash');
+      }
+
+      handleClearSelection();
+      setIsBulkMoveModalOpen(false);
+      setTargetMovePath('');
+
+      fetchStoragePaths(); // Refresh counts
+
+      alert(`Moved ${selectedFileIds.size} files.`);
+    } catch (e) {
+      console.error("Bulk move failed", e);
+      alert("Failed to move files");
+    }
+  };
+
   const fetchTags = async () => {
     try {
       const { data } = await axios.get(`${API_URL}/tags`);
@@ -44,6 +141,17 @@ function Dashboard({ user, signOut }) {
       console.error("Failed to fetch tags", e);
     }
   };
+
+  const fetchStoragePaths = async () => {
+    try {
+      const { data } = await axios.get(`${API_URL}/storage-paths`);
+      setStoragePaths(data);
+    } catch (e) {
+      console.error("Failed to fetch storage paths", e);
+    }
+  };
+
+  // ... (Other handlers same) ...
 
   const handlePreview = async (file) => {
     try {
@@ -158,11 +266,14 @@ function Dashboard({ user, signOut }) {
   const isAdmin = userGroups.includes('Admins');
   const isContributor = userGroups.includes('Contributors') || isAdmin;
 
-  const fetchFiles = async () => {
+  const fetchFiles = async (isTrash = false) => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`${API_URL}/files`);
-      // Sort by file_id 
+      const query = new URLSearchParams();
+      if (isTrash) query.append('trash', 'true');
+      if (selectedStoragePath) query.append('storage_path', selectedStoragePath);
+
+      const { data } = await axios.get(`${API_URL}/files?${query.toString()}`);
       setFiles(data);
       setSearchResults(null);
     } catch (error) {
@@ -171,6 +282,29 @@ function Dashboard({ user, signOut }) {
       setLoading(false);
     }
   };
+
+  const handleRestoreFile = async (filename) => {
+    try {
+      await axios.post(`${API_URL}/files/${filename}/restore`);
+      setFiles(prev => prev.filter(f => f.filename !== filename)); // Remove from trash list
+    } catch (e) {
+      console.error("Restore failed", e);
+      alert("Failed to restore file");
+    }
+  };
+
+  const handleDeletePermanent = async (filename) => {
+    if (!window.confirm(`PERMANENTLY DELETE "${filename}"? This cannot be undone.`)) return;
+    try {
+      await axios.delete(`${API_URL}/files/${filename}/permanent`);
+      setFiles(prev => prev.filter(f => f.filename !== filename));
+    } catch (e) {
+      console.error("Permanent delete failed", e);
+      alert("Failed to delete permanently");
+    }
+  };
+
+  // ... (Search logic same) ...
 
   const executeSearch = async (e) => {
     if (e.key === 'Enter') {
@@ -207,10 +341,13 @@ function Dashboard({ user, signOut }) {
 
   useEffect(() => {
     if (activeTab === 'browser') {
-      fetchFiles();
+      fetchFiles(false);
       fetchTags();
+      fetchStoragePaths();
+    } else if (activeTab === 'trash') {
+      fetchFiles(true);
     }
-  }, [activeTab]);
+  }, [activeTab, selectedStoragePath]);
 
   return (
     <div className="min-h-screen font-sans text-gray-900 selection:bg-indigo-100 selection:text-indigo-900">
@@ -258,6 +395,7 @@ function Dashboard({ user, signOut }) {
             {[
               { id: 'upload', icon: UploadCloud, label: 'Upload', visible: isContributor },
               { id: 'browser', icon: Search, label: 'Search', visible: true },
+              { id: 'trash', icon: Trash2, label: 'Trash', visible: isContributor },
               { id: 'admin', icon: ShieldCheck, label: 'Admin Hub', visible: isAdmin },
             ].filter(t => t.visible).map((tab) => (
               <button
@@ -291,7 +429,25 @@ function Dashboard({ user, signOut }) {
               <div className="space-y-6">
                 <div className="flex flex-col gap-4 mb-6">
                   <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-gray-900">Knowledge Base</h2>
+                    <div className="flex items-center gap-4">
+                      <h2 className="text-2xl font-bold text-gray-900">Knowledge Base</h2>
+                      {/* Storage Path Filter */}
+                      <div className="relative">
+                        <select
+                          value={selectedStoragePath || ''}
+                          onChange={(e) => setSelectedStoragePath(e.target.value || null)}
+                          className="appearance-none bg-white border border-gray-200 text-gray-700 py-2 pl-10 pr-8 rounded-xl text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 hover:border-indigo-400 transition-colors cursor-pointer"
+                        >
+                          <option value="">All Storage Paths</option>
+                          {storagePaths.map(path => (
+                            <option key={path.path_name} value={path.path_name}>
+                              {path.path_name} ({path.count || 0})
+                            </option>
+                          ))}
+                        </select>
+                        <Folder className="absolute left-3 top-2.5 w-4 h-4 text-indigo-500 pointer-events-none" />
+                      </div>
+                    </div>
 
                     {/* Search Mode Toggle */}
                     <div className="bg-gray-100 p-1 rounded-xl inline-flex">
@@ -393,6 +549,8 @@ function Dashboard({ user, signOut }) {
                                 isContributor={isContributor}
                                 onDelete={handleDeleteFile}
                                 onDownload={handleDownloadFile}
+                                isSelected={selectedFileIds.has(file.file_id)}
+                                onToggleSelect={handleToggleSelect}
                               />
                             ))}
 
@@ -402,9 +560,156 @@ function Dashboard({ user, signOut }) {
                             </div>
                           )}
                         </div>
+
+                        {/* BULK ACTION BAR */}
+                        {selectedFileIds.size > 0 && isContributor && (
+                          <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900/90 text-white backdrop-blur-md px-6 py-3 rounded-full shadow-2xl z-50 flex items-center gap-6 animate-in slide-in-from-bottom-10 fade-in duration-300 border border-white/10">
+                            <span className="font-bold text-sm tracking-wide">{selectedFileIds.size} Selected</span>
+
+                            <div className="h-4 w-px bg-gray-700"></div>
+
+                            <button
+                              onClick={() => setIsBulkMoveModalOpen(true)}
+                              className="flex items-center gap-2 text-sm font-semibold hover:text-indigo-400 transition-colors"
+                            >
+                              <Folder className="w-4 h-4" />
+                              Move
+                            </button>
+
+                            <button
+                              onClick={() => setIsBulkTagModalOpen(true)}
+                              className="flex items-center gap-2 text-sm font-semibold hover:text-indigo-400 transition-colors"
+                            >
+                              <Tag className="w-4 h-4" />
+                              Add Tags
+                            </button>
+
+                            <button
+                              onClick={handleClearSelection}
+                              className="p-1 hover:bg-white/10 rounded-full transition-all text-gray-400 hover:text-white"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+
+                        {/* BULK MOVE MODAL */}
+                        {isBulkMoveModalOpen && (
+                          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsBulkMoveModalOpen(false)}></div>
+                            <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md relative z-10 animate-in zoom-in-95 duration-200">
+                              <h3 className="text-xl font-bold mb-4 text-gray-900">Move {selectedFileIds.size} files</h3>
+                              <p className="text-sm text-gray-500 mb-6">Select a destination storage path.</p>
+
+                              <div className="mb-6 space-y-4">
+                                <label className="block text-sm font-medium text-gray-700">Storage Path</label>
+                                <select
+                                  value={targetMovePath}
+                                  onChange={(e) => setTargetMovePath(e.target.value)}
+                                  className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                                >
+                                  <option value="">Move to Root (No Path)</option>
+                                  {storagePaths.map(path => (
+                                    <option key={path.path_name} value={path.path_name}>{path.path_name}</option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div className="flex gap-3">
+                                <button
+                                  onClick={() => setIsBulkMoveModalOpen(false)}
+                                  className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  onClick={handleBulkMove}
+                                  className="flex-1 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition-colors"
+                                >
+                                  Move Files
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* BULK TAG MODAL */}
+                        {isBulkTagModalOpen && (
+                          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsBulkTagModalOpen(false)}></div>
+                            <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md relative z-10 animate-in zoom-in-95 duration-200">
+                              <h3 className="text-xl font-bold mb-4 text-gray-900">Add Tags to {selectedFileIds.size} files</h3>
+                              <p className="text-sm text-gray-500 mb-6">Select tags to assign. These will be added to existing tags.</p>
+
+                              <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto mb-6">
+                                {availableTags.map(tag => (
+                                  <button
+                                    key={tag.name}
+                                    onClick={() => handleBulkTag([tag.name])}
+                                    className="flex items-center gap-2 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 hover:border-indigo-200 transition-all group text-left"
+                                  >
+                                    <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: tag.color }}></div>
+                                    <span className="font-medium text-gray-700 group-hover:text-indigo-700">{tag.name}</span>
+                                  </button>
+                                ))}
+                              </div>
+                              <button
+                                onClick={() => setIsBulkTagModalOpen(false)}
+                                className="w-full py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
                   </>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'trash' && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <div className="p-2 bg-red-100 rounded-lg text-red-600">
+                      <Trash2 className="w-6 h-6" />
+                    </div>
+                    Trash Bin
+                  </h2>
+                </div>
+
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center py-20">
+                    <Loader2 className="w-10 h-10 text-gray-400 animate-spin mb-4" />
+                    <p className="text-gray-500">Loading trash...</p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {files.map((file) => (
+                      <FileCard
+                        key={file.file_id}
+                        file={file}
+                        viewingVersions={null}
+                        versions={[]}
+                        onPreview={() => { }}
+                        onFetchVersions={() => { }}
+                        availableTags={[]}
+                        onUpdateFileTags={() => { }}
+                        isContributor={isContributor}
+                        onDelete={handleDeletePermanent}
+                        onDownload={() => { }}
+                        isTrash={true}
+                        onRestore={handleRestoreFile}
+                      />
+                    ))}
+                    {files.length === 0 && (
+                      <div className="text-center py-20 glass rounded-3xl border-dashed border-2 border-gray-200">
+                        <p className="text-gray-500 font-medium">Trash is empty. All safe!</p>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}
