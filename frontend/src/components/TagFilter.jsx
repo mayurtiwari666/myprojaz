@@ -57,8 +57,8 @@ export default function TagFilter({ availableTags, selectedTags, onToggleTag }) 
             {isOpen && (
                 <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-20 animate-in fade-in zoom-in-95 duration-200 origin-top-left">
                     <div className="max-h-60 overflow-y-auto space-y-1 p-1">
-                        {availableTags.map((tag) => {
-                            const isSelected = selectedTags.includes(tag.name);
+                        {Array.isArray(availableTags) && availableTags.map((tag) => {
+                            const isSelected = Array.isArray(selectedTags) && selectedTags.includes(tag.name);
                             return (
                                 <button
                                     key={tag.name}

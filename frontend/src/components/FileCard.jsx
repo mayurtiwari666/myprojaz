@@ -90,7 +90,7 @@ export default function FileCard({ file, viewingVersions, versions, onPreview, o
                             )}
 
                             {/* Expanded PII Details */}
-                            {showPii && file.pii_flags && file.pii_flags.length > 0 && (
+                            {showPii && Array.isArray(file.pii_flags) && file.pii_flags.length > 0 && (
                                 <div className="w-full mt-2 p-2 bg-red-50 rounded-lg border border-red-100 text-xs text-red-700 animate-in slide-in-from-top-1">
                                     <p className="font-bold mb-1">Sensitive Data Found:</p>
                                     <div className="flex flex-wrap gap-1">
@@ -104,8 +104,8 @@ export default function FileCard({ file, viewingVersions, versions, onPreview, o
                             )}
 
                             {/* Tag Chips */}
-                            {file.tags && file.tags.map(tagName => {
-                                const tagInfo = availableTags.find(t => t.name === tagName);
+                            {Array.isArray(file.tags) && file.tags.map(tagName => {
+                                const tagInfo = (Array.isArray(availableTags) ? availableTags : []).find(t => t.name === tagName);
                                 return (
                                     <span
                                         key={tagName}
@@ -205,13 +205,12 @@ export default function FileCard({ file, viewingVersions, versions, onPreview, o
                                                 onClick={() => setIsTagDropdownOpen(false)}
                                             ></div>
                                             <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 z-50 p-2 animate-in fade-in zoom-in-95 duration-200">
-                                                <h6 className="text-xs font-bold text-gray-400 uppercase px-2 py-1 mb-1">Assign Tags</h6>
-                                                {availableTags.length === 0 ? (
+                                                {availableTags && Array.isArray(availableTags) && availableTags.length === 0 ? (
                                                     <p className="text-xs text-gray-500 px-2 py-2 italic text-center">No tags created yet.</p>
                                                 ) : (
                                                     <div className="max-h-48 overflow-y-auto space-y-1">
-                                                        {availableTags.map(tag => {
-                                                            const isSelected = file.tags?.includes(tag.name);
+                                                        {Array.isArray(availableTags) && availableTags.map(tag => {
+                                                            const isSelected = Array.isArray(file.tags) && file.tags.includes(tag.name);
                                                             return (
                                                                 <button
                                                                     key={tag.name}
@@ -245,7 +244,7 @@ export default function FileCard({ file, viewingVersions, versions, onPreview, o
                         <History className="w-3 h-3" /> Version History
                     </h5>
                     <div className="space-y-2">
-                        {versions.map((v) => (
+                        {Array.isArray(versions) && versions.map((v) => (
                             <div key={v.version_id} className="flex justify-between items-center text-sm p-3 bg-white/50 rounded-xl border border-gray-100 hover:border-indigo-200 transition-all">
                                 <div className="flex items-center gap-3">
                                     <div className={`w-2 h-2 rounded-full ${v.is_latest ? 'bg-indigo-500' : 'bg-gray-300'}`}></div>

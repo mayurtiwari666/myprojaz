@@ -69,7 +69,7 @@ function Dashboard({ user, signOut }) {
       });
 
       // Optimistic Update
-      setFiles(prev => prev.map(f => {
+      setFiles(prev => (Array.isArray(prev) ? prev : []).map(f => {
         if (selectedFileIds.has(f.file_id)) {
           const current = new Set(f.tags || []);
           tagsToAdd.forEach(t => current.add(t));
@@ -102,13 +102,13 @@ function Dashboard({ user, signOut }) {
 
       // Optimistic Update
       const newPath = targetMovePath || null;
-      setFiles(prev => prev.map(f =>
+      setFiles(prev => (Array.isArray(prev) ? prev : []).map(f =>
         selectedFileIds.has(f.file_id) ? { ...f, storage_path: newPath } : f
       ));
 
       // Update Search Results too
-      if (searchResults) {
-        setSearchResults(prev => prev.map(f =>
+      if (searchResults && Array.isArray(searchResults)) {
+        setSearchResults(prev => (Array.isArray(prev) ? prev : []).map(f =>
           selectedFileIds.has(f.file_id) ? { ...f, storage_path: newPath } : f
         ));
       }
@@ -165,11 +165,11 @@ function Dashboard({ user, signOut }) {
   };
 
   const handleUpdateFileTags = (fileId, newTags) => {
-    setFiles(prev => prev.map(f =>
+    setFiles(prev => (Array.isArray(prev) ? prev : []).map(f =>
       f.file_id === fileId ? { ...f, tags: newTags } : f
     ));
-    if (searchResults) {
-      setSearchResults(prev => prev.map(f =>
+    if (searchResults && Array.isArray(searchResults)) {
+      setSearchResults(prev => (Array.isArray(prev) ? prev : []).map(f =>
         f.file_id === fileId ? { ...f, tags: newTags } : f
       ));
     }
@@ -274,7 +274,7 @@ function Dashboard({ user, signOut }) {
       if (selectedStoragePath) query.append('storage_path', selectedStoragePath);
 
       const { data } = await axios.get(`${API_URL}/files?${query.toString()}`);
-      setFiles(data);
+      setFiles(Array.isArray(data) ? data : []);
       setSearchResults(null);
     } catch (error) {
       console.error("Error fetching files", error);
@@ -286,7 +286,7 @@ function Dashboard({ user, signOut }) {
   const handleRestoreFile = async (filename) => {
     try {
       await axios.post(`${API_URL}/files/${filename}/restore`);
-      setFiles(prev => prev.filter(f => f.filename !== filename)); // Remove from trash list
+      setFiles(prev => (Array.isArray(prev) ? prev : []).filter(f => f.filename !== filename)); // Remove from trash list
     } catch (e) {
       console.error("Restore failed", e);
       alert("Failed to restore file");
@@ -297,7 +297,7 @@ function Dashboard({ user, signOut }) {
     if (!window.confirm(`PERMANENTLY DELETE "${filename}"? This cannot be undone.`)) return;
     try {
       await axios.delete(`${API_URL}/files/${filename}/permanent`);
-      setFiles(prev => prev.filter(f => f.filename !== filename));
+      setFiles(prev => (Array.isArray(prev) ? prev : []).filter(f => f.filename !== filename));
     } catch (e) {
       console.error("Permanent delete failed", e);
       alert("Failed to delete permanently");
@@ -439,7 +439,7 @@ function Dashboard({ user, signOut }) {
                           className="appearance-none bg-white border border-gray-200 text-gray-700 py-2 pl-10 pr-8 rounded-xl text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 hover:border-indigo-400 transition-colors cursor-pointer"
                         >
                           <option value="">All Storage Paths</option>
-                          {storagePaths.map(path => (
+                          {Array.isArray(storagePaths) && storagePaths.map(path => (
                             <option key={path.path_name} value={path.path_name}>
                               {path.path_name} ({path.count || 0})
                             </option>
@@ -492,7 +492,7 @@ function Dashboard({ user, signOut }) {
                 ) : (
                   <>
                     {/* Semantic Results */}
-                    {searchMode === 'semantic' && searchResults && (
+                    {searchMode === 'semantic' && Array.isArray(searchResults) && (
                       <div className="grid gap-4">
                         {searchResults.map((result, idx) => (
                           <div key={idx} className="glass-card p-6 rounded-2xl border-l-4 border-indigo-500">
@@ -528,7 +528,7 @@ function Dashboard({ user, signOut }) {
                         />
 
                         <div className="grid gap-4">
-                          {files
+                          {Array.isArray(files) && files
                             .filter(f => {
                               // Filename Search
                               const nameMatch = f.filename.toLowerCase().includes(searchQuery.toLowerCase());
@@ -609,7 +609,7 @@ function Dashboard({ user, signOut }) {
                                   className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
                                 >
                                   <option value="">Move to Root (No Path)</option>
-                                  {storagePaths.map(path => (
+                                  {Array.isArray(storagePaths) && storagePaths.map(path => (
                                     <option key={path.path_name} value={path.path_name}>{path.path_name}</option>
                                   ))}
                                 </select>
@@ -642,7 +642,7 @@ function Dashboard({ user, signOut }) {
                               <p className="text-sm text-gray-500 mb-6">Select tags to assign. These will be added to existing tags.</p>
 
                               <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto mb-6">
-                                {availableTags.map(tag => (
+                                {Array.isArray(availableTags) && availableTags.map(tag => (
                                   <button
                                     key={tag.name}
                                     onClick={() => handleBulkTag([tag.name])}
@@ -687,7 +687,7 @@ function Dashboard({ user, signOut }) {
                   </div>
                 ) : (
                   <div className="grid gap-4">
-                    {files.map((file) => (
+                    {Array.isArray(files) && files.map((file) => (
                       <FileCard
                         key={file.file_id}
                         file={file}

@@ -134,7 +134,7 @@ export default function TagManager() {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-100">
-                        {tags.map((tag) => (
+                        {Array.isArray(tags) && tags.map((tag) => (
                             <tr key={tag.name} className="hover:bg-gray-50/50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="text-sm font-bold text-gray-900">{tag.name}</span>

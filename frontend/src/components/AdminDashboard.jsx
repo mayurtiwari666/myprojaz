@@ -191,8 +191,8 @@ export default function AdminDashboard() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {users.map((u) => {
-                                        const isOnline = stats?.online_users_list?.includes(u.username);
+                                    {Array.isArray(users) && users.map((u) => {
+                                        const isOnline = stats?.online_users_list && Array.isArray(stats.online_users_list) && stats.online_users_list.includes(u.username);
                                         return (
                                             <tr key={u.username} className="hover:bg-indigo-50/30">
                                                 <td className="px-6 py-4 text-sm font-medium text-gray-900">{u.username}</td>
@@ -241,7 +241,7 @@ export default function AdminDashboard() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {logs.map((log) => (
+                                    {Array.isArray(logs) && logs.map((log) => (
                                         <tr key={log.event_id} className="hover:bg-indigo-50/30">
                                             <td className="px-6 py-4 text-sm text-gray-500">{new Date(log.timestamp).toLocaleString()}</td>
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">{log.user || 'anonymous'}</td>

@@ -150,7 +150,7 @@ export default function StoragePathManager() {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-100">
-                        {paths.map((path) => (
+                        {Array.isArray(paths) && paths.map((path) => (
                             <tr key={path.path_name} className="hover:bg-gray-50/50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="text-sm font-bold text-gray-900 font-mono">{path.path_name}</span>
