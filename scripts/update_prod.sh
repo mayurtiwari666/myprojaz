@@ -18,9 +18,11 @@ pip install -r backend/requirements.txt
 echo "✅ Python Dependencies Updated."
 
 # 3. Rebuild Frontend
+cd frontend
 npm install
 npm run build
 sudo cp -r dist/* /var/www/html/
+cd ..
 echo "✅ Frontend Rebuilt & Copied."
 
 # 4. Restart Services
