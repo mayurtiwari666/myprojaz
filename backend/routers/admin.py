@@ -217,13 +217,21 @@ def get_quarantined_files():
         
         # Scan for files with virus_status=infected
         # User requested to ONLY show files in quarantine folder/infected status.
+        # FIX: Handle pagination manually to ensure we scan the whole table
         response = files_table.scan(
             FilterExpression="virus_status = :v",
-            ExpressionAttributeValues={':v': 'infected'},
-            Limit=500
+            ExpressionAttributeValues={':v': 'infected'}
         )
         items = response.get('Items', [])
         
+        while 'LastEvaluatedKey' in response:
+            response = files_table.scan(
+                FilterExpression="virus_status = :v",
+                ExpressionAttributeValues={':v': 'infected'},
+                ExclusiveStartKey=response['LastEvaluatedKey']
+            )
+            items.extend(response.get('Items', []))
+
         quarantined = []
         for item in items:
             # logic: Only items with virus_status='infected' are in the S3 quarantine folder

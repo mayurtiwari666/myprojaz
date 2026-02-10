@@ -80,7 +80,12 @@ def list_files(trash: bool = False, storage_path: str = None):
             return [item for item in all_items if item.get('is_deleted') is True]
         else:
             # Show ONLY active items (is_deleted is False or None)
-            active = [item for item in all_items if not item.get('is_deleted')]
+            # AND filter out infected files
+            active = [
+                item for item in all_items 
+                if not item.get('is_deleted') 
+                and item.get('virus_status') != 'infected'
+            ]
             
             # Filter by Storage Path
             if storage_path:
