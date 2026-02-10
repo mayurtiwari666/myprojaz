@@ -10,14 +10,27 @@ dist/
 htmlcov/
 faiss_index.bin
 
+
 # Experimental & Debug Scripts
 scripts/debug_*.py
 scripts/test_*.py
 scripts/upload_*.py
+scripts/verify_*.py
+scripts/reset_*.py
+scripts/check_*.py
+scripts/reindex_*.py
+scripts/create_*.py
+scripts/manage_*.py
+scripts/setup_*.py
+scripts/sync_*.py
 
-# Local Secrets
+# Local Secrets & Logs
 *.env
 *.pem
+*.log
+*.bin
 
 # Data Files
 metadata.pkl
+faiss_index_new.bin
+cors.json

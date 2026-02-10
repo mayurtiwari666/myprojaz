@@ -208,3 +208,79 @@ def export_audit_logs():
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/quarantine")
+def get_quarantined_files():
+    try:
+        aws = get_aws_resources()
+        files_table = aws['files']
+        
+        # Scan for files with virus_status=infected
+        # User requested to ONLY show files in quarantine folder/infected status.
+        response = files_table.scan(
+            FilterExpression="virus_status = :v",
+            ExpressionAttributeValues={':v': 'infected'},
+            Limit=500
+        )
+        items = response.get('Items', [])
+        
+        quarantined = []
+        for item in items:
+            # logic: Only items with virus_status='infected' are in the S3 quarantine folder
+            # We don't check for PII anymore for this specific endpoint
+            if not item.get('is_deleted'): 
+                quarantined.append(item)
+        
+        # Serialization Fix: Decimals
+        from decimal import Decimal
+        for item in quarantined:
+            if isinstance(item.get('size'), Decimal):
+                 item['size'] = int(item['size'])
+            if isinstance(item.get('uploaded_at'), Decimal):
+                 item['uploaded_at'] = float(item['uploaded_at'])
+                 
+        return quarantined
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/quarantine/{filename}")
+def delete_quarantined_file(filename: str):
+    try:
+        aws = get_aws_resources()
+        files = aws['files']
+        s3 = aws['s3']
+        
+        # Get file metadata to check if it's a virus
+        file_item = files.get_item(Key={'file_id': filename}).get('Item')
+        
+        if not file_item:
+             # Already gone?
+             return {"status": "deleted_or_not_found"}
+             
+        is_virus = file_item.get('virus_status') == 'infected'
+        bucket_name = os.getenv('S3_BUCKET_NAME')
+        
+        # S3 Deletion Logic
+        if is_virus:
+            # Virus files are moved to 'quarantine/' prefix by Lambda
+            key = f"quarantine/{filename}"
+            try:
+                s3.delete_object(Bucket=bucket_name, Key=key)
+            except Exception as e:
+                pass # S3 Delete Error (Quarantine)
+        else:
+            # PII files are still in 'uploads/' or root
+            key = filename
+            try:
+                s3.delete_object(Bucket=bucket_name, Key=key)
+            except Exception as e:
+                pass # S3 Delete Error (Standard)
+
+        # Usage Update: If we track usage, we should decrement it. 
+        # For now, just hard delete from DB
+        files.delete_item(Key={'file_id': filename})
+        
+        return {"status": "permanently_deleted", "filename": filename, "type": "virus" if is_virus else "pii"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

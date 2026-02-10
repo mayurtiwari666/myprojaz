@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
     Activity, Users, Database, AlertCircle,
-    BarChart2, Clock
+    BarChart2, Clock, ShieldAlert
 } from 'lucide-react';
 import TagManager from './TagManager';
 import StoragePathManager from './StoragePathManager';
@@ -15,6 +15,7 @@ export default function AdminDashboard() {
     const [stats, setStats] = useState(null);
     const [users, setUsers] = useState([]);
     const [logs, setLogs] = useState([]);
+    const [quarantine, setQuarantine] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const [error, setError] = useState(null);
@@ -49,11 +50,20 @@ export default function AdminDashboard() {
         }
     };
 
+    const fetchQuarantine = async () => {
+        try {
+            const res = await axios.get(`${API_URL}/admin/quarantine`);
+            setQuarantine(res.data);
+        } catch (err) {
+            console.error("Quarantine fetch failed", err);
+        }
+    };
+
     useEffect(() => {
         const loadAll = async () => {
             setLoading(true);
             setError(null);
-            await Promise.allSettled([fetchStats(), fetchUsers(), fetchLogs()]);
+            await Promise.allSettled([fetchStats(), fetchUsers(), fetchLogs(), fetchQuarantine()]);
             setLoading(false);
         };
         loadAll();
@@ -134,6 +144,13 @@ export default function AdminDashboard() {
                     className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'paths' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                 >
                     Storage Paths
+                </button>
+                <button
+                    onClick={() => setActiveTab('quarantine')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${activeTab === 'quarantine' ? 'bg-red-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                    <ShieldAlert className="h-4 w-4" />
+                    Quarantine ({quarantine.length})
                 </button>
             </div>
             {/* Content Switcher */}
@@ -261,6 +278,85 @@ export default function AdminDashboard() {
                     </div>
                 )
             }
+            {activeTab === 'quarantine' && (
+                <div className="glass p-8 rounded-[2rem] border border-white/50 shadow-xl shadow-indigo-500/5">
+                    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                        <ShieldAlert className="w-5 h-5 text-red-500" />
+                        Quarantined Files
+                    </h3>
+
+                    {quarantine.length === 0 ? (
+                        <div className="text-center py-12 text-gray-500">
+                            <ShieldAlert className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                            <p>No threats detected. System is clean.</p>
+                        </div>
+                    ) : (
+                        <div className="overflow-hidden rounded-xl border border-gray-100">
+                            <table className="min-w-full bg-white/50 backdrop-blur-sm">
+                                <thead className="bg-red-50/80">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-red-800 uppercase">Filename</th>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-red-800 uppercase">Threat Type</th>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-red-800 uppercase">Details</th>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-red-800 uppercase">Size</th>
+                                        <th className="px-6 py-3 text-right text-xs font-semibold text-red-800 uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {quarantine.map((file) => (
+                                        <tr key={file.file_id} className="hover:bg-red-50/30">
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{file.filename}</td>
+                                            <td className="px-6 py-4 text-sm">
+                                                {file.virus_status === 'infected' ? (
+                                                    <span className="px-2 py-1 bg-red-900 text-red-100 text-xs font-bold rounded-md border border-red-700 animate-pulse">
+                                                        VIRUS DETECTED
+                                                    </span>
+                                                ) : (
+                                                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-md border border-yellow-200">
+                                                        PII FLAGGED
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {file.virus_status === 'infected' ? (
+                                                        <span className="text-red-700 font-mono text-xs">Malware Signature Found</span>
+                                                    ) : (
+                                                        file.pii_flags && file.pii_flags.map(flag => (
+                                                            <span key={flag} className="px-2 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-md border border-red-200">
+                                                                {flag}
+                                                            </span>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-500">{(file.size / 1024).toFixed(1)} KB</td>
+                                            <td className="px-6 py-4 text-sm text-right">
+                                                <button
+                                                    onClick={async () => {
+                                                        if (!confirm("Permanently delete this file?")) return;
+                                                        try {
+                                                            await axios.delete(`${API_URL}/admin/quarantine/${file.filename}`);
+                                                            fetchQuarantine(); // Refresh
+                                                            fetchStats();
+                                                        } catch (e) {
+                                                            alert("Delete failed: " + e.message);
+                                                        }
+                                                    }}
+                                                    className="text-red-600 hover:text-red-900 font-medium"
+                                                >
+                                                    Delete Permanent
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            )}
+
             {
                 activeTab === 'tags' && (
                     <TagManager />
