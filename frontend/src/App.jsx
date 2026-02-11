@@ -195,13 +195,15 @@ function Dashboard({ user, signOut }) {
   };
 
   const handleDownloadFile = async (filename) => {
+    console.log("Initiating download for:", filename);
     try {
       const { data } = await axios.get(`${API_URL}/files/${filename}/download`);
+      console.log("Download URL received:", data.download_url);
       // Trigger download by opening in new tab
       window.open(data.download_url, '_blank');
     } catch (e) {
       console.error("Download failed", e);
-      alert("Failed to get download link");
+      alert("Failed to get download link: " + (e.response?.data?.detail || e.message));
     }
   };
 
@@ -236,7 +238,7 @@ function Dashboard({ user, signOut }) {
               axios.post(`${API_URL}/admin/log-login`, {
                 username: username,
                 source: 'web'
-              }).catch(err => console.error("Login log", err));
+              }).catch(() => { }); // Suppress errors for non-admins
             }
 
             setUserGroups(groups);
@@ -730,6 +732,7 @@ function Dashboard({ user, signOut }) {
         file={previewFile}
         url={previewUrl}
         onClose={() => { setPreviewFile(null); setPreviewUrl(null); }}
+        onDownload={handleDownloadFile}
       />
     </div>
   );

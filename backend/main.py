@@ -236,7 +236,7 @@ def get_file_versions(filename: str):
 from backend.services.logging_service import log_audit_event
 
 @app.get("/files/{filename}/view")
-def view_file(filename: str, user: dict = Depends(require_contributor)):
+def view_file(filename: str, user: dict = Depends(get_current_user)):
     try:
         # Audit Log: Preview
         log_audit_event(
@@ -260,7 +260,7 @@ def view_file(filename: str, user: dict = Depends(require_contributor)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/files/{filename}/download")
-def download_file(filename: str, user: dict = Depends(require_contributor)):
+def download_file(filename: str, user: dict = Depends(get_current_user)):
     try:
         # Audit Log: Download
         log_audit_event(

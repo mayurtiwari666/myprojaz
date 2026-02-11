@@ -2,7 +2,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 import boto3
 from backend.config import settings
-from backend.auth import require_contributor
+from backend.auth import require_contributor, get_current_user
 import datetime
 from boto3.dynamodb.conditions import Key, Attr
 from typing import List
@@ -12,7 +12,7 @@ from typing import List
 router = APIRouter(
     prefix="/storage-paths",
     tags=["storage-paths"],
-    dependencies=[Depends(require_contributor)]
+    dependencies=[Depends(get_current_user)]
 )
 
 
